@@ -25,11 +25,11 @@ var gameOption = {
   boxSpeed: 800
 }
 
-window.onbeforeunload = () => {
-
-  localStorage.clear();
-  return "Do you really want to leave our application?";
-}
+// window.onbeforeunload = () => {
+//
+//   localStorage.clear();
+//   return "Do you really want to leave our application?";
+// }
 
 export class InGame extends Phaser.Scene{
 
