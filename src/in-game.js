@@ -25,6 +25,12 @@ var gameOption = {
   boxSpeed: 800
 }
 
+window.onbeforeunload = () => {
+
+  localStorage.clear();
+  return "Do you really want to leave our application?";
+}
+
 export class InGame extends Phaser.Scene{
 
   constructor(){
@@ -51,12 +57,30 @@ export class InGame extends Phaser.Scene{
 
     adButton.on('pointerdown', () => {
 
-      let video = this.add.video(360, 640);
-      video.setOrigin(0.5, 0.5);
-      //video.setDisplaySize(300, 300);
-      video.loadURL('http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4');
-      video.play();
+      let video = document.createElement('video');
+      let element;
+
+      video.src = 'http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4';
+      video.playsinline = true;
+      video.width = 720;
+      video.height = 1280;
+      video.autoplay = true;
+
       console.log(video);
+
+      video.addEventListener('play', (event) => {
+
+        element = this.add.dom(360, 640, video, {
+          'background-color': 'black'
+        });
+        console.log('Test');
+      })
+
+      video.addEventListener('ended', (event) => {
+
+        element.destroy();
+      })
+
     })
 
     userScore = 0;
