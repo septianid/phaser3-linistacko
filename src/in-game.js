@@ -15,6 +15,7 @@ var userScore;
 
 var boxHeight;
 var groundHeight;
+var mainCamera;
 
 var adButton;
 
@@ -22,7 +23,8 @@ var gameOption = {
 
   gameTime: 30,
   boxMoveRange: [-300, 300],
-  boxSpeed: 800
+  boxSpeed: 800,
+  fallingBoxHeight: 900
 }
 
 window.onbeforeunload = () => {
@@ -66,14 +68,14 @@ export class InGame extends Phaser.Scene{
       video.height = 1280;
       video.autoplay = true;
 
-      console.log(video);
+      //console.log(video);
 
       video.addEventListener('play', (event) => {
 
         element = this.add.dom(360, 640, video, {
           'background-color': 'black'
         });
-        console.log('Test');
+        //console.log('Test');
       })
 
       video.addEventListener('ended', (event) => {
@@ -110,10 +112,9 @@ export class InGame extends Phaser.Scene{
     ground.setStatic(true);
 
     this.movingItem();
+
     this.matter.world.on('collisionstart', (e, obj1, obj2) => {
 
-      //console.log(obj1.isCrate);
-      //console.log(obj2.isCrate);
       if(obj1.isCrate && !obj1.hit){
 
         obj1.hit = true;
@@ -136,6 +137,8 @@ export class InGame extends Phaser.Scene{
         this.fallingItem();
       }
     })
+
+    //this.setCamera();
   }
 
   update(){
@@ -154,16 +157,32 @@ export class InGame extends Phaser.Scene{
     })
   }
 
-  getStackHeight(){
+  cameraZoom(){
 
     let maxHeight = 0;
-    boxGroup.getChildren().forEach((item) => {
+    let zoomFactor;
+    let newHeight;
 
-      // if(item.hit){
-      //
-      //   let height = Math.round((this.game.config.height - ))
-      // }
+    boxGroup.getChildren().forEach((item) => {
+      if(item.body.hit){
+        //let height = Math.round((this.game.config.height - groundHeight - item.y - boxHeight / 2) / boxHeight) + 1;
+        maxHeight = Math.max(maxHeight, Math.round((ground.getBounds().top - item.getBounds().top) / item.displayWidth))
+      }
     })
+
+    movingBox.y = ground.getBounds().top - maxHeight * movingBox.displayWidth - gameOption.fallingBoxHeight;
+    zoomFactor = gameOption.fallingBoxHeight / (ground.getBounds().top - movingBox.y);
+    mainCamera.zoomTo(zoomFactor, 500);
+    newHeight = this.game.config.height / zoomFactor;
+    mainCamera.pan(this.game.config.width / 2, this.game.config.height / 2 - (newHeight - this.game.config.height) / 2, 500);
+  }
+
+  setCamera(){
+
+    //console.log('Set');
+    mainCamera = this.cameras.add(0, 0, 720, 1280);
+    mainCamera.ignore([timeText, adButton]);
+    this.cameras.main.ignore([ground, movingBox])
   }
 
   gameTimer(){
@@ -215,13 +234,14 @@ export class InGame extends Phaser.Scene{
 
   createNewItem(){
 
+    //this.cameraZoom();
     canDrop = true;
     movingBox.visible = true;
   }
 
   movingItem(){
 
-    movingBox = this.add.sprite(this.game.config.width / 2 - gameOption.boxMoveRange[0], ground.getBounds().top - 700, 'box');
+    movingBox = this.add.sprite(this.game.config.width / 2 - gameOption.boxMoveRange[0], ground.getBounds().top - gameOption.fallingBoxHeight, 'box');
     //movingBox.body.friction = 1;
     movingBox.setOrigin(0.5, 0.5);
     this.tweens.add({
@@ -244,9 +264,13 @@ export class InGame extends Phaser.Scene{
     fallingBox.body.hit = false;
 
     boxGroup.add(fallingBox);
+    //this.cameras.main.ignore(fallingBox);
   }
 
   removeItem(){
+
+    let boxScoreText;
+    let userScoreText;
 
     if(boxGroup.getChildren().length > 0){
 
@@ -265,18 +289,19 @@ export class InGame extends Phaser.Scene{
         align: 'center'
       }).setOrigin(0.5, 0.5);
 
-      //console.log(userScore);
       tempBox.destroy();
+
+      //mainCamera.ignore(boxScoreText)
     }
 
     else {
 
       let userScoreText
+      let userScoreSignText;
 
       removeEvent.remove();
-      console.log(userScore);
 
-      this.add.text(360, 640, 'YOUR SCORE', {
+      userScoreSignText = this.add.text(360, 640, 'YOUR SCORE', {
 
         font: 'bold 40px Arial',
         fill: 'white',
@@ -290,12 +315,14 @@ export class InGame extends Phaser.Scene{
         align: 'center'
       }).setOrigin(0.5, 0.5);
 
-      //this.scene.start('PlayGame');
+      //mainCamera.ignore([userScoreSignText, userScoreText])
+
       this.input.on('pointerdown', () => {
 
         this.scene.start('PlayGame');
       })
     }
+
   }
 
 
