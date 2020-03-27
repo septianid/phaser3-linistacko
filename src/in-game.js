@@ -17,8 +17,6 @@ var boxHeight;
 var groundHeight;
 var mainCamera;
 
-var adButton;
-
 var gameOption = {
 
   gameTime: 30,
@@ -44,46 +42,12 @@ export class InGame extends Phaser.Scene{
 
     this.load.image('box', './src/assets/box.png');
     this.load.image('ground', './src/assets/ground.png');
-    this.load.image('ad_button', './src/assets/ad_button.png');
   }
 
   create(){
 
     boxHeight = this.textures.get('box').getSourceImage().height;
     groundHeight = this.textures.get('ground').getSourceImage().height;
-
-
-    adButton = this.add.sprite(670, 50, 'ad_button').setScale(0.2);
-    adButton.setOrigin(0.5, 0.5);
-    adButton.setInteractive();
-
-    adButton.on('pointerdown', () => {
-
-      let video = document.createElement('video');
-      let element;
-
-      video.src = 'http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4';
-      video.playsinline = true;
-      video.width = 720;
-      video.height = 1280;
-      video.autoplay = true;
-
-      //console.log(video);
-
-      video.addEventListener('play', (event) => {
-
-        element = this.add.dom(360, 640, video, {
-          'background-color': 'black'
-        });
-        //console.log('Test');
-      })
-
-      video.addEventListener('ended', (event) => {
-
-        element.destroy();
-      })
-
-    })
 
     userScore = 0;
     timer = 0;

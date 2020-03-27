@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import {InGame} from './in-game.js';
+import {Menu} from './main-menu.js';
 
 const config = {
   type: Phaser.CANVAS,
@@ -25,7 +26,7 @@ const config = {
     width: 720,
     height: 1280,
   },
-  scene: InGame,
+  scene: [Menu, InGame],
   audio: {
     disableWebAudio : true,
   }
