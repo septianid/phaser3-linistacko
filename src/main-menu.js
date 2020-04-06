@@ -1,9 +1,7 @@
 import Phaser from 'phaser';
 
-var adButton
-
-var urlParams = new URLSearchParams(window.location.search);
-var userSession = urlParams.get('session');
+var adButton;
+var leaderbutton;
 
 export class Menu extends Phaser.Scene {
 
@@ -15,16 +13,22 @@ export class Menu extends Phaser.Scene {
   preload(){
 
     this.load.image('play_button', './src/assets/play_button.png');
+    this.load.image('Leaderboard','./src/assets/Leaderboard.png');
+    this.load.image('Leaderboard_panel','./src/assets/Leaderboard_panel.png');
+    this.load.image("Exit",'./src/assets/Exit.png');
   }
 
   create(){
 
     adButton = this.add.sprite(this.game.config.width / 2, 530, 'play_button').setScale(0.1);
+    leaderbutton = this.add.sprite(this.game.config.width/2,660, 'Leaderboard').setScale(1);
     adButton.setOrigin(0.5, 0.5);
     adButton.setInteractive();
     adButton.on('pointerdown', () => this.playAd())
+    leaderbutton.setOrigin(0.5,0.5);
+    leaderbutton.setInteractive();
+    leaderbutton.on("pointerdown",() => this.leadermenu())
 
-    this.getVideoSource();
   }
 
   update(){
@@ -60,107 +64,22 @@ export class Menu extends Phaser.Scene {
 
   getVideoSource(){
 
-    fetch('https://linipoin-api.macroad.co.id/api/v1.0/leaderboard/check_user_limit/?lang=en&session='+userSession+'&linigame_platform_token=891ff5abb0c27161fb683bcaeb1d73accf1c9c5e',{
+    fetch('https://linipoin-api.macroad.co.id/api/v1.0/leaderboard/leaderboard_imlek?limit_highscore=5&limit_total_score=5&linigame_platform_token=66cfbe9876ff5097bc861dc8b8fce03ccfe3fb43',{
 
       method:'GET'
     }).then(response => {
 
-      if(!response.ok){
-        return response.json().then(error => Promise.reject(error));
-      }
-      else {
+      if(response.ok){
+
         return response.json()
       }
-
+      throw new Error(response.status)
     }).then(data => {
 
       console.log(data.result);
     }).catch(error => {
 
-      console.log(error.result.code);
-    })
-  }
-
-  getUserData(){
-
-    fetch('',{
-
-      method: 'GET'
-    }).then(response => {
-
-      if(!response.ok){
-        return response.json().then(error => Promise.reject(error));
-      }
-      else {
-        return response.json()
-      }
-    }).then(data => {
-
-
-    }).catch(error => {
-
-
-    })
-  }
-
-  getLeaderboardData(){
-
-    fetch('',{
-
-      method: 'GET'
-    }).then(response => {
-
-      if(!response.ok){
-        return response.json().then(error => Promise.reject(error));
-      }
-      else {
-        return response.json()
-      }
-    }).then(data => {
-
-
-    }).catch(error => {
-
-
-    })
-  }
-
-  getUserRank(){
-
-    fetch('',{
-
-      method: 'GET'
-    }).then(response => {
-
-      if(!response.ok){
-        return response.json().then(error => Promise.reject(error));
-      }
-      else {
-        return response.json()
-      }
-    }).then(data => {
-
-
-    }).catch(error => {
-
-
-    })
-  }
-
-  postDataOnStart(){
-
-    fetch('',{
-
-      method: 'POST'
-    }).then(response => {
-
-
-    }).then(data => {
-
-
-    }).catch(error => {
-
-
+      console.error(error.message);
     })
   }
 
@@ -185,4 +104,35 @@ export class Menu extends Phaser.Scene {
 
     return ip;
   }
+
+
+  leadermenu()
+  {
+    this.disablebuttons();
+    var Leader_panel = this.add.sprite(360,580,'Leaderboard_panel').setScale(3);
+    Leader_panel.setOrigin(0.5,0.5);
+    var Exit_panel =  this.add.sprite(Leader_panel.x+250,Leader_panel.y-450,'Exit').setScale(1);
+    Exit_panel.setInteractive();
+    Exit_panel.setOrigin(0.5,0.5);
+
+    Exit_panel.on('pointerdown',()=>{
+      Leader_panel.destroy();
+      Exit_panel.destroy();
+      this.activatebuttons();
+    })
+  }
+
+  disablebuttons()
+  {
+    adButton.disableInteractive();
+    leaderbutton.disableInteractive();
+  }
+  
+  activatebuttons()
+  {
+    adButton.setInteractive();
+    leaderbutton.setInteractive();
+  }
+  
+
 }
