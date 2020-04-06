@@ -135,7 +135,7 @@ export class Menu extends Phaser.Scene {
     this.disablebuttons();
     var instruksi_panel = this.add.sprite(360,580,'Instruksi_panel').setScale(3);
     instruksi_panel.setOrigin(0.5,0.5);
-    var Exit_panel2 =  this.add.sprite(instruksi_panel.x+250,instruksi_panel.y-450,'Exit2').setScale(1);
+    var Exit_panel2 =  this.add.sprite(instruksi_panel.x+250,instruksi_panel.y-450,'Exit').setScale(1);
     Exit_panel2.setInteractive();
     Exit_panel2.setOrigin(0.5,0.5);
 
