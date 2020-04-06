@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 
 var adButton;
 var leaderbutton;
+var instruksibutton;
 
 export class Menu extends Phaser.Scene {
 
@@ -16,18 +17,25 @@ export class Menu extends Phaser.Scene {
     this.load.image('Leaderboard','./src/assets/Leaderboard.png');
     this.load.image('Leaderboard_panel','./src/assets/Leaderboard_panel.png');
     this.load.image("Exit",'./src/assets/Exit.png');
+    this.load.image("Exit2",'./src/assets/Exit.png');
+    this.load.image('Instruksi','./src/assets/Instruksi.png');
+    this.load.image('Instruksi_panel','./src/assets/Instruksi_panel.png');
   }
 
   create(){
 
     adButton = this.add.sprite(this.game.config.width / 2, 530, 'play_button').setScale(0.1);
     leaderbutton = this.add.sprite(this.game.config.width/2,660, 'Leaderboard').setScale(1);
+    instruksibutton = this.add.sprite(this.game.config.width/2,720, 'Instruksi').setScale(1);
     adButton.setOrigin(0.5, 0.5);
     adButton.setInteractive();
     adButton.on('pointerdown', () => this.playAd())
     leaderbutton.setOrigin(0.5,0.5);
     leaderbutton.setInteractive();
     leaderbutton.on("pointerdown",() => this.leadermenu())
+    instruksibutton.setOrigin(0.5,0.5);
+    instruksibutton.setInteractive();
+    instruksibutton.on("pointerdown",() => this.instructionmenu())
 
   }
 
@@ -122,16 +130,34 @@ export class Menu extends Phaser.Scene {
     })
   }
 
+  instructionmenu()
+  {
+    this.disablebuttons();
+    var instruksi_panel = this.add.sprite(360,580,'Instruksi_panel').setScale(3);
+    instruksi_panel.setOrigin(0.5,0.5);
+    var Exit_panel2 =  this.add.sprite(instruksi_panel.x+250,instruksi_panel.y-450,'Exit2').setScale(1);
+    Exit_panel2.setInteractive();
+    Exit_panel2.setOrigin(0.5,0.5);
+
+    Exit_panel2.on('pointerdown',()=>{
+      instruksi_panel.destroy();
+      Exit_panel2.destroy();
+      this.activatebuttons();
+    })
+  }
+
   disablebuttons()
   {
     adButton.disableInteractive();
     leaderbutton.disableInteractive();
+    instruksibutton.disableInteractive();
   }
   
   activatebuttons()
   {
     adButton.setInteractive();
     leaderbutton.setInteractive();
+    instruksibutton.setInteractive();
   }
   
 
