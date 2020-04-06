@@ -1,6 +1,9 @@
 import Phaser from 'phaser';
 
-var adButton;
+var adButton
+
+var urlParams = new URLSearchParams(window.location.search);
+var userSession = urlParams.get('session');
 
 export class Menu extends Phaser.Scene {
 
@@ -20,6 +23,8 @@ export class Menu extends Phaser.Scene {
     adButton.setOrigin(0.5, 0.5);
     adButton.setInteractive();
     adButton.on('pointerdown', () => this.playAd())
+
+    this.getVideoSource();
   }
 
   update(){
@@ -55,22 +60,107 @@ export class Menu extends Phaser.Scene {
 
   getVideoSource(){
 
-    fetch('https://linipoin-api.macroad.co.id/api/v1.0/leaderboard/leaderboard_imlek?limit_highscore=5&limit_total_score=5&linigame_platform_token=66cfbe9876ff5097bc861dc8b8fce03ccfe3fb43',{
+    fetch('https://linipoin-api.macroad.co.id/api/v1.0/leaderboard/check_user_limit/?lang=en&session='+userSession+'&linigame_platform_token=891ff5abb0c27161fb683bcaeb1d73accf1c9c5e',{
 
       method:'GET'
     }).then(response => {
 
-      if(response.ok){
-
+      if(!response.ok){
+        return response.json().then(error => Promise.reject(error));
+      }
+      else {
         return response.json()
       }
-      throw new Error(response.status)
+
     }).then(data => {
 
       console.log(data.result);
     }).catch(error => {
 
-      console.error(error.message);
+      console.log(error.result.code);
+    })
+  }
+
+  getUserData(){
+
+    fetch('',{
+
+      method: 'GET'
+    }).then(response => {
+
+      if(!response.ok){
+        return response.json().then(error => Promise.reject(error));
+      }
+      else {
+        return response.json()
+      }
+    }).then(data => {
+
+
+    }).catch(error => {
+
+
+    })
+  }
+
+  getLeaderboardData(){
+
+    fetch('',{
+
+      method: 'GET'
+    }).then(response => {
+
+      if(!response.ok){
+        return response.json().then(error => Promise.reject(error));
+      }
+      else {
+        return response.json()
+      }
+    }).then(data => {
+
+
+    }).catch(error => {
+
+
+    })
+  }
+
+  getUserRank(){
+
+    fetch('',{
+
+      method: 'GET'
+    }).then(response => {
+
+      if(!response.ok){
+        return response.json().then(error => Promise.reject(error));
+      }
+      else {
+        return response.json()
+      }
+    }).then(data => {
+
+
+    }).catch(error => {
+
+
+    })
+  }
+
+  postDataOnStart(){
+
+    fetch('',{
+
+      method: 'POST'
+    }).then(response => {
+
+
+    }).then(data => {
+
+
+    }).catch(error => {
+
+
     })
   }
 
