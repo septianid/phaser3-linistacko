@@ -27,15 +27,18 @@ export class Menu extends Phaser.Scene {
     adButton = this.add.sprite(this.game.config.width / 2, 530, 'play_button').setScale(0.1);
     leaderbutton = this.add.sprite(this.game.config.width/2,660, 'Leaderboard').setScale(1);
     instruksibutton = this.add.sprite(this.game.config.width/2,720, 'Instruksi').setScale(1);
+
     adButton.setOrigin(0.5, 0.5);
     adButton.setInteractive();
     adButton.on('pointerdown', () => this.playAd())
+
     leaderbutton.setOrigin(0.5,0.5);
     leaderbutton.setInteractive();
-    leaderbutton.on("pointerdown",() => this.leadermenu())
+    leaderbutton.on("pointerdown",() => this.leaderMenu())
+
     instruksibutton.setOrigin(0.5,0.5);
     instruksibutton.setInteractive();
-    instruksibutton.on("pointerdown",() => this.instructionmenu())
+    instruksibutton.on("pointerdown",() => this.instructionMenu())
 
   }
 
@@ -114,51 +117,55 @@ export class Menu extends Phaser.Scene {
   }
 
 
-  leadermenu()
+  leaderMenu()
   {
-    this.disablebuttons();
-    var Leader_panel = this.add.sprite(360,580,'Leaderboard_panel').setScale(3);
-    Leader_panel.setOrigin(0.5,0.5);
-    var Exit_panel =  this.add.sprite(Leader_panel.x+250,Leader_panel.y-450,'Exit').setScale(1);
-    Exit_panel.setInteractive();
-    Exit_panel.setOrigin(0.5,0.5);
+    this.disableButtons();
 
-    Exit_panel.on('pointerdown',()=>{
-      Leader_panel.destroy();
-      Exit_panel.destroy();
-      this.activatebuttons();
+    var leader_panel = this.add.sprite(360,580, 'Leaderboard_panel').setScale(3);
+    leader_panel.setOrigin(0.5,0.5);
+
+    var exit_panel =  this.add.sprite(leader_panel.x+250, leader_panel.y-450, 'Exit').setScale(1);
+    exit_panel.setInteractive();
+    exit_panel.setOrigin(0.5,0.5);
+
+    exit_panel.on('pointerdown',()=>{
+      leader_panel.destroy();
+      exit_panel.destroy();
+      this.activateButtons();
     })
   }
 
-  instructionmenu()
+  instructionMenu()
   {
-    this.disablebuttons();
-    var instruksi_panel = this.add.sprite(360,580,'Instruksi_panel').setScale(3);
+    this.disableButtons();
+
+    var instruksi_panel = this.add.sprite(360,580, 'Instruksi_panel').setScale(3);
     instruksi_panel.setOrigin(0.5,0.5);
-    var Exit_panel2 =  this.add.sprite(instruksi_panel.x+250,instruksi_panel.y-450,'Exit').setScale(1);
-    Exit_panel2.setInteractive();
-    Exit_panel2.setOrigin(0.5,0.5);
 
-    Exit_panel2.on('pointerdown',()=>{
+    var exit_panel2 =  this.add.sprite(instruksi_panel.x+250, instruksi_panel.y-450, 'Exit').setScale(1);
+    exit_panel2.setInteractive();
+    exit_panel2.setOrigin(0.5,0.5);
+
+    exit_panel2.on('pointerdown',()=>{
       instruksi_panel.destroy();
-      Exit_panel2.destroy();
-      this.activatebuttons();
+      exit_panel2.destroy();
+      this.activateButtons();
     })
   }
 
-  disablebuttons()
+  disableButtons()
   {
     adButton.disableInteractive();
     leaderbutton.disableInteractive();
     instruksibutton.disableInteractive();
   }
-  
-  activatebuttons()
+
+  activateButtons()
   {
     adButton.setInteractive();
     leaderbutton.setInteractive();
     instruksibutton.setInteractive();
   }
-  
+
 
 }
