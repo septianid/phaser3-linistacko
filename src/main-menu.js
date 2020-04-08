@@ -124,11 +124,12 @@ export class Menu extends Phaser.Scene {
   }
 
 
+
   leaderMenu()
   {
     this.disableButtons();
 
-    var leader_panel = this.add.sprite(610,1130, 'Leaderboard_panel').setScale(3);
+    var leader_panel = this.add.sprite(360,580, 'Leaderboard_panel').setScale(3);
     leader_panel.setOrigin(0.5,0.5);
 
     var exit_panel =  this.add.sprite(leader_panel.x+250, leader_panel.y-450, 'Exit').setScale(1);
@@ -170,7 +171,6 @@ export class Menu extends Phaser.Scene {
       banned.destroy();
       this.activateButtons();
     })
-
   }
 
   disableButtons()
