@@ -4,6 +4,7 @@ var adButton;
 var leaderbutton;
 var instruksibutton;
 var realadbutton;
+var musicbutton;
 
 export class Menu extends Phaser.Scene {
 
@@ -22,21 +23,30 @@ export class Menu extends Phaser.Scene {
     this.load.image('Instruksi','./src/assets/Instruksi.png');
     this.load.image('Instruksi_panel','./src/assets/Instruksi_panel.png');
     this.load.image('panel','./src/assets/panel.png');
+    this.load.image('music','./src/assets/music.png');
+    this.load.image('banned','./src/assets/banned.png');
   }
 
   create(){
     adButton = this.add.sprite(this.game.config.width / 2, 530, 'play_button').setScale(0.1);
     leaderbutton = this.add.sprite(this.game.config.width/2,660, 'Leaderboard').setScale(1);
     instruksibutton = this.add.sprite(this.game.config.width/2,720, 'Instruksi').setScale(1);
+    musicbutton = this.add.sprite(610,1130, 'music').setScale(0.2);
     adButton.setOrigin(0.5, 0.5);
     adButton.setInteractive();
-    adButton.on('pointerdown', () => this.swictchmenu())
+    adButton.on('pointerdown', () => this.playAd())
+
     leaderbutton.setOrigin(0.5,0.5);
     leaderbutton.setInteractive();
-    leaderbutton.on("pointerdown",() => this.leadermenu())
+    leaderbutton.on("pointerdown",() => this.leaderMenu())
+
     instruksibutton.setOrigin(0.5,0.5);
     instruksibutton.setInteractive();
-    instruksibutton.on("pointerdown",() => this.instructionmenu())
+    instruksibutton.on("pointerdown",() => this.instructionMenu())
+
+    musicbutton.setOrigin(0.5,0.5);
+    musicbutton.setInteractive();
+    musicbutton.on("pointerdown",() => this.disablemusic())
   }
 
   update(){
@@ -114,63 +124,70 @@ export class Menu extends Phaser.Scene {
   }
 
 
-  leadermenu()
+  leaderMenu()
   {
-    this.disablebuttons();
-    var Leader_panel = this.add.sprite(360,580,'Leaderboard_panel').setScale(3);
-    Leader_panel.setOrigin(0.5,0.5);
-    var Exit_panel =  this.add.sprite(Leader_panel.x+250,Leader_panel.y-450,'Exit').setScale(1);
-    Exit_panel.setInteractive();
-    Exit_panel.setOrigin(0.5,0.5);
+    this.disableButtons();
 
-    Exit_panel.on('pointerdown',()=>{
-      Leader_panel.destroy();
-      Exit_panel.destroy();
-      this.activatebuttons();
+    var leader_panel = this.add.sprite(610,1130, 'Leaderboard_panel').setScale(3);
+    leader_panel.setOrigin(0.5,0.5);
+
+    var exit_panel =  this.add.sprite(leader_panel.x+250, leader_panel.y-450, 'Exit').setScale(1);
+    exit_panel.setInteractive();
+    exit_panel.setOrigin(0.5,0.5);
+
+    exit_panel.on('pointerdown',()=>{
+      leader_panel.destroy();
+      exit_panel.destroy();
+      this.activateButtons();
     })
   }
 
-  swictchmenu()
+  instructionMenu()
   {
-    this.disablebuttons();
-    var panel = this.add.sprite(360,580,'panel').setScale(2);
-    panel.setOrigin(0.5,0.5);
-    var realadbutton = this.add.sprite(panel.x-230,panel.y,'ad_button').setScale(4);
-    var playbutton = this.add.sprite(panel.x+230,panel.y,'play_button').setScale(0.07);
-    realadbutton.setOrigin(0.5,0.5);
-    realadbutton.setInteractive();
-    realadbutton.on("pointerdown",() => this.playAd());
-  }
+    this.disableButtons();
 
-  instructionmenu()
-  {
-    this.disablebuttons();
-    var instruksi_panel = this.add.sprite(360,580,'Instruksi_panel').setScale(3);
+    var instruksi_panel = this.add.sprite(360,580, 'Instruksi_panel').setScale(3);
     instruksi_panel.setOrigin(0.5,0.5);
-    var Exit_panel2 =  this.add.sprite(instruksi_panel.x+250,instruksi_panel.y-450,'Exit').setScale(1);
-    Exit_panel2.setInteractive();
-    Exit_panel2.setOrigin(0.5,0.5);
 
-    Exit_panel2.on('pointerdown',()=>{
+    var exit_panel2 =  this.add.sprite(instruksi_panel.x+250, instruksi_panel.y-450, 'Exit').setScale(1);
+    exit_panel2.setInteractive();
+    exit_panel2.setOrigin(0.5,0.5);
+
+    exit_panel2.on('pointerdown',()=>{
       instruksi_panel.destroy();
-      Exit_panel2.destroy();
-      this.activatebuttons();
+      exit_panel2.destroy();
+      this.activateButtons();
     })
   }
 
-  disablebuttons()
+  disablemusic()
+  {
+    this.disableButtons();
+    var banned = this.add.sprite(610,1130, 'banned').setScale(0.4);
+    banned.setOrigin(0.5,0.5);
+    banned.setInteractive();
+    banned.on('pointerdown',()=>{
+      banned.destroy();
+      this.activateButtons();
+    })
+
+  }
+
+  disableButtons()
   {
     adButton.disableInteractive();
     leaderbutton.disableInteractive();
     instruksibutton.disableInteractive();
+    musicbutton.disableInteractive();
   }
-  
-  activatebuttons()
+
+  activateButtons()
   {
     adButton.setInteractive();
     leaderbutton.setInteractive();
     instruksibutton.setInteractive();
+    musicbutton.setInteractive();
   }
-  
+
 
 }
