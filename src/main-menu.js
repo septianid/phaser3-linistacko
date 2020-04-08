@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 
 var adButton;
-var leaderbutton;
-var instruksibutton;
-var musicbutton;
+var leaderButton;
+var instruksiButton;
+var musicButton;
 
 export class Menu extends Phaser.Scene {
 
@@ -13,6 +13,7 @@ export class Menu extends Phaser.Scene {
   }
 
   preload(){
+    
     this.load.image('ad_button','./src/assets/ad_button.png');
     this.load.image('play_button', './src/assets/play_button.png');
     this.load.image('Leaderboard','./src/assets/Leaderboard.png');
@@ -27,25 +28,28 @@ export class Menu extends Phaser.Scene {
   }
 
   create(){
+
     adButton = this.add.sprite(this.game.config.width / 2, 530, 'play_button').setScale(0.1);
-    leaderbutton = this.add.sprite(this.game.config.width/2,660, 'Leaderboard').setScale(1);
-    instruksibutton = this.add.sprite(this.game.config.width/2,720, 'Instruksi').setScale(1);
-    musicbutton = this.add.sprite(610,1130, 'music').setScale(0.2);
+    leaderButton = this.add.sprite(this.game.config.width/2,660, 'Leaderboard').setScale(1);
+    instruksiButton = this.add.sprite(this.game.config.width/2,720, 'Instruksi').setScale(1);
+    musicButton = this.add.sprite(610,1130, 'music').setScale(0.2);
+
+
     adButton.setOrigin(0.5, 0.5);
     adButton.setInteractive();
-    adButton.on('pointerdown', () => this.playmenu())
+    adButton.on('pointerdown', () => this.playMenu())
 
-    leaderbutton.setOrigin(0.5,0.5);
-    leaderbutton.setInteractive();
-    leaderbutton.on("pointerdown",() => this.leaderMenu())
+    leaderButton.setOrigin(0.5,0.5);
+    leaderButton.setInteractive();
+    leaderButton.on("pointerdown",() => this.leaderMenu())
 
-    instruksibutton.setOrigin(0.5,0.5);
-    instruksibutton.setInteractive();
-    instruksibutton.on("pointerdown",() => this.instructionMenu())
+    instruksiButton.setOrigin(0.5,0.5);
+    instruksiButton.setInteractive();
+    instruksiButton.on("pointerdown",() => this.instructionMenu())
 
-    musicbutton.setOrigin(0.5,0.5);
-    musicbutton.setInteractive();
-    musicbutton.on("pointerdown",() => this.disablemusic())
+    musicButton.setOrigin(0.5,0.5);
+    musicButton.setInteractive();
+    musicButton.on("pointerdown",() => this.disableMusic())
   }
 
   update(){
@@ -122,13 +126,13 @@ export class Menu extends Phaser.Scene {
     return ip;
   }
 
-  playmenu()
-  {
+  playMenu(){
+
     this.disableButtons();
     var panelgameoptions = this.add.sprite(360,550, 'panel').setScale(1.4);
     var realplaybutton = this.add.sprite(panelgameoptions.x+170,panelgameoptions.y-30, 'play_button').setScale(0.08);
-    var realadbutton = this.add.sprite(panelgameoptions.x-170,panelgameoptions.y-30, 'ad_button').setScale(3);
-    
+    var realadbutton = this.add.sprite(panelgameoptions.x-170,panelgameoptions.y-30, 'ad_button').setScale(0.35);
+
     panelgameoptions.setOrigin(0.5,0.5);
     realplaybutton.setOrigin(0.5,0.5);
 
@@ -174,7 +178,7 @@ export class Menu extends Phaser.Scene {
     })
   }
 
-  disablemusic()
+  disableMusic()
   {
     //this.disableButtons();
     var banned = this.add.sprite(610,1130, 'banned').setScale(0.4);
@@ -189,16 +193,16 @@ export class Menu extends Phaser.Scene {
   disableButtons()
   {
     adButton.disableInteractive();
-    leaderbutton.disableInteractive();
-    instruksibutton.disableInteractive();
+    leaderButton.disableInteractive();
+    instruksiButton.disableInteractive();
     //musicbutton.disableInteractive();
   }
 
   activateButtons()
   {
     adButton.setInteractive();
-    leaderbutton.setInteractive();
-    instruksibutton.setInteractive();
+    leaderButton.setInteractive();
+    instruksiButton.setInteractive();
     //musicbutton.setInteractive();
   }
 
