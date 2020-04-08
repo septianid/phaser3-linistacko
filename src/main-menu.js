@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 var adButton;
 var leaderbutton;
 var instruksibutton;
+var realadbutton;
 
 export class Menu extends Phaser.Scene {
 
@@ -12,31 +13,30 @@ export class Menu extends Phaser.Scene {
   }
 
   preload(){
-
+    this.load.image('ad_button','./src/assets/ad_button.png');
     this.load.image('play_button', './src/assets/play_button.png');
     this.load.image('Leaderboard','./src/assets/Leaderboard.png');
     this.load.image('Leaderboard_panel','./src/assets/Leaderboard_panel.png');
     this.load.image("Exit",'./src/assets/Exit.png');
-    this.load.image("Exit2",'./src/assets/Exit.png');
+    //this.load.image("Exit2",'./src/assets/Exit.png');
     this.load.image('Instruksi','./src/assets/Instruksi.png');
     this.load.image('Instruksi_panel','./src/assets/Instruksi_panel.png');
+    this.load.image('panel','./src/assets/panel.png');
   }
 
   create(){
-
     adButton = this.add.sprite(this.game.config.width / 2, 530, 'play_button').setScale(0.1);
     leaderbutton = this.add.sprite(this.game.config.width/2,660, 'Leaderboard').setScale(1);
     instruksibutton = this.add.sprite(this.game.config.width/2,720, 'Instruksi').setScale(1);
     adButton.setOrigin(0.5, 0.5);
     adButton.setInteractive();
-    adButton.on('pointerdown', () => this.playAd())
+    adButton.on('pointerdown', () => this.swictchmenu())
     leaderbutton.setOrigin(0.5,0.5);
     leaderbutton.setInteractive();
     leaderbutton.on("pointerdown",() => this.leadermenu())
     instruksibutton.setOrigin(0.5,0.5);
     instruksibutton.setInteractive();
     instruksibutton.on("pointerdown",() => this.instructionmenu())
-
   }
 
   update(){
@@ -128,6 +128,18 @@ export class Menu extends Phaser.Scene {
       Exit_panel.destroy();
       this.activatebuttons();
     })
+  }
+
+  swictchmenu()
+  {
+    this.disablebuttons();
+    var panel = this.add.sprite(360,580,'panel').setScale(2);
+    panel.setOrigin(0.5,0.5);
+    var realadbutton = this.add.sprite(panel.x-230,panel.y,'ad_button').setScale(4);
+    var playbutton = this.add.sprite(panel.x+230,panel.y,'play_button').setScale(0.07);
+    realadbutton.setOrigin(0.5,0.5);
+    realadbutton.setInteractive();
+    realadbutton.on("pointerdown",() => this.playAd());
   }
 
   instructionmenu()
