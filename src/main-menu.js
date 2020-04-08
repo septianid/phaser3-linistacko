@@ -3,7 +3,6 @@ import Phaser from 'phaser';
 var adButton;
 var leaderbutton;
 var instruksibutton;
-var realadbutton;
 var musicbutton;
 
 export class Menu extends Phaser.Scene {
@@ -34,7 +33,7 @@ export class Menu extends Phaser.Scene {
     musicbutton = this.add.sprite(610,1130, 'music').setScale(0.2);
     adButton.setOrigin(0.5, 0.5);
     adButton.setInteractive();
-    adButton.on('pointerdown', () => this.playAd())
+    adButton.on('pointerdown', () => this.playmenu())
 
     leaderbutton.setOrigin(0.5,0.5);
     leaderbutton.setInteractive();
@@ -123,6 +122,20 @@ export class Menu extends Phaser.Scene {
     return ip;
   }
 
+  playmenu()
+  {
+    this.disableButtons();
+    var panelgameoptions = this.add.sprite(360,550, 'panel').setScale(1.4);
+    var realplaybutton = this.add.sprite(panelgameoptions.x+170,panelgameoptions.y-30, 'play_button').setScale(0.08);
+    var realadbutton = this.add.sprite(panelgameoptions.x-170,panelgameoptions.y-30, 'ad_button').setScale(3);
+    
+    panelgameoptions.setOrigin(0.5,0.5);
+    realplaybutton.setOrigin(0.5,0.5);
+
+    realadbutton.setOrigin(0.5,0.5);
+    realadbutton.setInteractive();
+    realadbutton.on("pointerdown",() => this.playAd())
+  }
 
 
   leaderMenu()
@@ -163,13 +176,13 @@ export class Menu extends Phaser.Scene {
 
   disablemusic()
   {
-    this.disableButtons();
+    //this.disableButtons();
     var banned = this.add.sprite(610,1130, 'banned').setScale(0.4);
     banned.setOrigin(0.5,0.5);
     banned.setInteractive();
     banned.on('pointerdown',()=>{
       banned.destroy();
-      this.activateButtons();
+      //this.activateButtons();
     })
   }
 
@@ -178,7 +191,7 @@ export class Menu extends Phaser.Scene {
     adButton.disableInteractive();
     leaderbutton.disableInteractive();
     instruksibutton.disableInteractive();
-    musicbutton.disableInteractive();
+    //musicbutton.disableInteractive();
   }
 
   activateButtons()
@@ -186,7 +199,7 @@ export class Menu extends Phaser.Scene {
     adButton.setInteractive();
     leaderbutton.setInteractive();
     instruksibutton.setInteractive();
-    musicbutton.setInteractive();
+    //musicbutton.setInteractive();
   }
 
 
