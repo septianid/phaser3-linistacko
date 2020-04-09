@@ -4,6 +4,7 @@ var adButton;
 var leaderButton;
 var instruksiButton;
 var musicButton;
+var musicstatus;
 
 export class Menu extends Phaser.Scene {
 
@@ -25,6 +26,8 @@ export class Menu extends Phaser.Scene {
     this.load.image('panel','./src/assets/panel.png');
     this.load.image('music','./src/assets/music.png');
     this.load.image('banned','./src/assets/banned.png');
+    this.load.image('music_on','./src/assets/music_on.png');
+    this.load.image('music_off','./src/assets/music_off.png');
   }
 
   create(){
@@ -32,7 +35,7 @@ export class Menu extends Phaser.Scene {
     adButton = this.add.sprite(this.game.config.width / 2, 530, 'play_button').setScale(0.1);
     leaderButton = this.add.sprite(this.game.config.width/2,660, 'Leaderboard').setScale(1);
     instruksiButton = this.add.sprite(this.game.config.width/2,720, 'Instruksi').setScale(1);
-    musicButton = this.add.sprite(610,1130, 'music').setScale(0.2);
+    
 
 
     adButton.setOrigin(0.5, 0.5);
@@ -47,9 +50,20 @@ export class Menu extends Phaser.Scene {
     instruksiButton.setInteractive();
     instruksiButton.on("pointerdown",() => this.instructionMenu())
 
-    musicButton.setOrigin(0.5,0.5);
+    musicstatus = true;
+
+    if(musicstatus==true)
+    {
+      musicButton = this.add.sprite(610,1130, 'music_on').setScale(0.2);
+      musicButton.setOrigin(0.5,0.5);
+    }
+    else
+    {
+      musicButton = this.add.sprite(610,1130, 'music_off').setScale(0.2);
+      musicButton.setOrigin(0.5,0.5);
+    }
     musicButton.setInteractive();
-    musicButton.on("pointerdown",() => this.disableMusic())
+    musicButton.on('pointerdown', () => this.disableMusic());
   }
 
   update(){
@@ -180,14 +194,18 @@ export class Menu extends Phaser.Scene {
 
   disableMusic()
   {
-    //this.disableButtons();
-    var banned = this.add.sprite(610,1130, 'banned').setScale(0.4);
-    banned.setOrigin(0.5,0.5);
-    banned.setInteractive();
-    banned.on('pointerdown',()=>{
-      banned.destroy();
-      //this.activateButtons();
-    })
+    if(musicstatus==true)
+    {
+      musicstatus = false;
+      musicButton.setTexture('music_on');
+      musicButton.setScale(0.2);
+    }
+    else
+    {
+      musicstatus = true;
+      musicButton.setTexture('music_off');
+      musicButton.setScale(0.2);
+    }
   }
 
   disableButtons()
