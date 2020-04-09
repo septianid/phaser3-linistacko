@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
 
-var adButton;
+var playButton;
 var leaderButton;
 var instruksiButton;
+var tncButton;
 var musicButton;
-var musicstatus;
+var musicStatus;
 
 export class Menu extends Phaser.Scene {
 
@@ -14,15 +15,16 @@ export class Menu extends Phaser.Scene {
   }
 
   preload(){
-    
+
     this.load.image('ad_button','./src/assets/ad_button.png');
     this.load.image('play_button', './src/assets/play_button.png');
+    this.load.image('TNC','./src/assets/TNC.png');
+    this.load.image('TNC_panel','./src/assets/TNC_panel.png');
     this.load.image('Leaderboard','./src/assets/Leaderboard.png');
     this.load.image('Leaderboard_panel','./src/assets/Leaderboard_panel.png');
-    this.load.image("Exit",'./src/assets/Exit.png');
-    //this.load.image("Exit2",'./src/assets/Exit.png');
     this.load.image('Instruksi','./src/assets/Instruksi.png');
     this.load.image('Instruksi_panel','./src/assets/Instruksi_panel.png');
+    this.load.image("Exit",'./src/assets/Exit.png');
     this.load.image('panel','./src/assets/panel.png');
     this.load.image('music','./src/assets/music.png');
     this.load.image('banned','./src/assets/banned.png');
@@ -32,15 +34,14 @@ export class Menu extends Phaser.Scene {
 
   create(){
 
-    adButton = this.add.sprite(this.game.config.width / 2, 530, 'play_button').setScale(0.1);
-    leaderButton = this.add.sprite(this.game.config.width/2,660, 'Leaderboard').setScale(1);
-    instruksiButton = this.add.sprite(this.game.config.width/2,720, 'Instruksi').setScale(1);
-    
+    playButton = this.add.sprite(this.game.config.width / 2, 530, 'play_button').setScale(0.1);
+    leaderButton = this.add.sprite(this.game.config.width / 2, 660, 'Leaderboard').setScale(1);
+    instruksiButton = this.add.sprite(this.game.config.width / 2, 720, 'Instruksi').setScale(1);
+    tncButton = this.add.sprite(this.game.config.width / 2, 780, 'TNC').setScale(1);
 
-
-    adButton.setOrigin(0.5, 0.5);
-    adButton.setInteractive();
-    adButton.on('pointerdown', () => this.playMenu())
+    playButton.setOrigin(0.5, 0.5);
+    playButton.setInteractive();
+    playButton.on('pointerdown', () => this.playMenu())
 
     leaderButton.setOrigin(0.5,0.5);
     leaderButton.setInteractive();
@@ -50,18 +51,23 @@ export class Menu extends Phaser.Scene {
     instruksiButton.setInteractive();
     instruksiButton.on("pointerdown",() => this.instructionMenu())
 
-    musicstatus = true;
+    tncButton.setOrigin(0.5,0.5);
+    tncButton.setInteractive();
+    tncButton.on("pointerdown",() => this.tncMenu())
 
-    if(musicstatus==true)
-    {
+    musicStatus = true;
+
+    if(musicStatus==true){
+
       musicButton = this.add.sprite(610,1130, 'music_on').setScale(0.2);
       musicButton.setOrigin(0.5,0.5);
     }
-    else
-    {
+    else{
+
       musicButton = this.add.sprite(610,1130, 'music_off').setScale(0.2);
       musicButton.setOrigin(0.5,0.5);
     }
+
     musicButton.setInteractive();
     musicButton.on('pointerdown', () => this.disableMusic());
   }
@@ -143,84 +149,110 @@ export class Menu extends Phaser.Scene {
   playMenu(){
 
     this.disableButtons();
-    var panelgameoptions = this.add.sprite(360,550, 'panel').setScale(1.4);
-    var realplaybutton = this.add.sprite(panelgameoptions.x+170,panelgameoptions.y-30, 'play_button').setScale(0.08);
-    var realadbutton = this.add.sprite(panelgameoptions.x-170,panelgameoptions.y-30, 'ad_button').setScale(0.35);
+    var panelGameOptions = this.add.sprite(360,550, 'panel').setScale(1.4);
+    var realPlayButton = this.add.sprite(panelGameOptions.x + 170, panelGameOptions.y-30, 'play_button').setScale(0.08);
+    var realAdButton = this.add.sprite(panelGameOptions.x - 170, panelGameOptions.y-30, 'ad_button').setScale(0.35);
 
-    panelgameoptions.setOrigin(0.5,0.5);
-    realplaybutton.setOrigin(0.5,0.5);
+    panelGameOptions.setOrigin(0.5,0.5);
+    realPlayButton.setOrigin(0.5,0.5);
+    realAdButton.setOrigin(0.5,0.5);
 
-    realadbutton.setOrigin(0.5,0.5);
-    realadbutton.setInteractive();
-    realadbutton.on("pointerdown",() => this.playAd())
+    realAdButton.setInteractive();
+    realAdButton.on("pointerdown",() => this.playAd())
+
+    realPlayButton.setInteractive();
+    realPlayButton.on('pointerdown', () => {
+
+      this.scene.start('PlayGame');
+    })
   }
 
 
-  leaderMenu()
-  {
+  leaderMenu(){
+
     this.disableButtons();
 
-    var leader_panel = this.add.sprite(360,580, 'Leaderboard_panel').setScale(3);
+    var leader_panel = this.add.sprite(360, 580, 'Leaderboard_panel').setScale(3);
     leader_panel.setOrigin(0.5,0.5);
 
-    var exit_panel =  this.add.sprite(leader_panel.x+250, leader_panel.y-450, 'Exit').setScale(1);
+    var exit_panel =  this.add.sprite(leader_panel.x + 250, leader_panel.y - 450, 'Exit').setScale(1);
     exit_panel.setInteractive();
     exit_panel.setOrigin(0.5,0.5);
 
-    exit_panel.on('pointerdown',()=>{
+    exit_panel.on('pointerdown',() => {
       leader_panel.destroy();
       exit_panel.destroy();
       this.activateButtons();
     })
   }
 
-  instructionMenu()
-  {
+  instructionMenu(){
+
     this.disableButtons();
 
-    var instruksi_panel = this.add.sprite(360,580, 'Instruksi_panel').setScale(3);
+    var instruksi_panel = this.add.sprite(360, 580, 'Instruksi_panel').setScale(3);
     instruksi_panel.setOrigin(0.5,0.5);
 
-    var exit_panel2 =  this.add.sprite(instruksi_panel.x+250, instruksi_panel.y-450, 'Exit').setScale(1);
-    exit_panel2.setInteractive();
-    exit_panel2.setOrigin(0.5,0.5);
+    var exit_panel =  this.add.sprite(instruksi_panel.x + 250, instruksi_panel.y - 450, 'Exit').setScale(1);
+    exit_panel.setInteractive();
+    exit_panel.setOrigin(0.5,0.5);
 
-    exit_panel2.on('pointerdown',()=>{
+    exit_panel.on('pointerdown',() => {
       instruksi_panel.destroy();
-      exit_panel2.destroy();
+      exit_panel.destroy();
       this.activateButtons();
     })
   }
 
-  disableMusic()
-  {
-    if(musicstatus==true)
-    {
-      musicstatus = false;
+  tncMenu(){
+
+    this.disableButtons();
+
+    var tnc_panel = this.add.sprite(360,580, 'TNC_panel').setScale(3);
+    tnc_panel.setOrigin(0.5, 0.5);
+
+    var exit_panel =  this.add.sprite(tnc_panel.x + 250, tnc_panel.y - 450, 'Exit').setScale(1);
+    exit_panel.setInteractive();
+    exit_panel.setOrigin(0.5,0.5);
+
+    exit_panel.on('pointerdown',() => {
+      tnc_panel.destroy();
+      exit_panel.destroy();
+      this.activateButtons();
+    })
+  }
+
+  disableMusic(){
+
+    if(musicStatus == true){
+
+      musicStatus = false;
       musicButton.setTexture('music_on');
       musicButton.setScale(0.2);
     }
-    else
-    {
-      musicstatus = true;
+    else{
+      
+      musicStatus = true;
       musicButton.setTexture('music_off');
       musicButton.setScale(0.2);
     }
   }
 
-  disableButtons()
-  {
-    adButton.disableInteractive();
+  disableButtons(){
+
+    playButton.disableInteractive();
     leaderButton.disableInteractive();
     instruksiButton.disableInteractive();
+    tncButton.disableInteractive();
     //musicbutton.disableInteractive();
   }
 
-  activateButtons()
-  {
-    adButton.setInteractive();
+  activateButtons(){
+
+    playButton.setInteractive();
     leaderButton.setInteractive();
     instruksiButton.setInteractive();
+    tncButton.setInteractive();
     //musicbutton.setInteractive();
   }
 
