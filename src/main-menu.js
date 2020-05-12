@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 
-var playButton;
-var leaderButton;
-var instruksiButton;
-var tncButton;
+var challengeGate;
+var challengerListSign;
+var challengerGuideSign;
+var challengerContract;
 var musicButton;
 var musicStatus;
 
@@ -16,55 +16,59 @@ export class Menu extends Phaser.Scene {
 
   preload(){
 
+    this.load.image('TITLE', 'src/assets/LOGO.png');
+    this.load.image('MENU_BG', 'src/assets/MENU_BG.jpg');
     this.load.image('ad_button','./src/assets/ad_button.png');
-    this.load.image('play_button', './src/assets/play_button.png');
-    this.load.image('TNC','./src/assets/TNC.png');
-    this.load.image('TNC_panel','./src/assets/TNC_panel.png');
-    this.load.image('Leaderboard','./src/assets/Leaderboard.png');
-    this.load.image('Leaderboard_panel','./src/assets/Leaderboard_panel.png');
-    this.load.image('Instruksi','./src/assets/Instruksi.png');
-    this.load.image('Instruksi_panel','./src/assets/Instruksi_panel.png');
-    this.load.image("Exit",'./src/assets/Exit.png');
-    this.load.image('panel','./src/assets/panel.png');
-    this.load.image('music','./src/assets/music.png');
-    this.load.image('banned','./src/assets/banned.png');
-    this.load.image('music_on','./src/assets/music_on.png');
-    this.load.image('music_off','./src/assets/music_off.png');
+    this.load.image('BM_1P', './src/assets/BM_1P.png');
+    this.load.image('BM_2I','./src/assets/BM_2I.png');
+    this.load.image('BM_3TC','./src/assets/BM_3TC.png');
+    this.load.image('BM_4LD','./src/assets/BM_4LD.png');
+    this.load.image('BM_5N','./src/assets/BM_5N.png');
+    this.load.image('BM_5F','./src/assets/BM_5F.png');
+    this.load.image("BM_GEXB",'./src/assets/BM_GEXB.png');
+    this.load.image('PM_1I','./src/assets/PM_1I.png');
+    this.load.image('PM_2TC','./src/assets/PM_2TC.png');
+    this.load.image('PM_3LD','./src/assets/PM_3LD.png');
   }
 
   create(){
 
-    playButton = this.add.sprite(this.game.config.width / 2, 530, 'play_button').setScale(0.1);
-    leaderButton = this.add.sprite(this.game.config.width / 2, 660, 'Leaderboard').setScale(1);
-    instruksiButton = this.add.sprite(this.game.config.width / 2, 720, 'Instruksi').setScale(1);
-    tncButton = this.add.sprite(this.game.config.width / 2, 780, 'TNC').setScale(1);
+    var background = this.add.sprite(360, 1280, 'MENU_BG').setScale(0.68, 0.67)
+    background.setOrigin(0.5, 1);
 
-    playButton.setOrigin(0.5, 0.5);
-    playButton.setInteractive();
-    playButton.on('pointerdown', () => this.playMenu())
+    var title = this.add.sprite(360, 230, 'TITLE').setScale(0.5)
+    title.setOrigin(0.5, 0.5);
 
-    leaderButton.setOrigin(0.5,0.5);
-    leaderButton.setInteractive();
-    leaderButton.on("pointerdown",() => this.leaderMenu())
+    challengeGate = this.add.sprite(360, 530, 'BM_1P').setScale(0.23);
+    challengeGate.setOrigin(0.5, 0.5);
+    challengeGate.setInteractive();
+    challengeGate.on('pointerdown', () => this.playMenu())
 
-    instruksiButton.setOrigin(0.5,0.5);
-    instruksiButton.setInteractive();
-    instruksiButton.on("pointerdown",() => this.instructionMenu())
+    challengerListSign = this.add.sprite(440, 700, 'BM_4LD').setScale(0.16);
+    challengerListSign.setOrigin(0.5,0.5);
+    challengerListSign.setInteractive();
+    challengerListSign.on("pointerdown",() => this.leaderMenu())
 
-    tncButton.setOrigin(0.5,0.5);
-    tncButton.setInteractive();
-    tncButton.on("pointerdown",() => this.tncMenu())
+    challengerGuideSign = this.add.sprite(200, 620, 'BM_2I').setScale(0.16);
+    challengerGuideSign.setOrigin(0.5,0.5);
+    challengerGuideSign.setInteractive();
+    challengerGuideSign.on("pointerdown",() => this.instructionMenu())
+
+    challengerContract = this.add.sprite(300, challengerListSign.y + 30, 'BM_3TC').setScale(0.16);
+    challengerContract.setOrigin(0.5,0.5);
+    challengerContract.setInteractive();
+    challengerContract.on("pointerdown",() => this.tncMenu())
 
     musicStatus = true;
 
     if(musicStatus==true){
 
-      musicButton = this.add.sprite(610,1130, 'music_on').setScale(0.2);
+      musicButton = this.add.sprite(530,610, 'BM_5N').setScale(0.16);
       musicButton.setOrigin(0.5,0.5);
     }
     else{
 
-      musicButton = this.add.sprite(610,1130, 'music_off').setScale(0.2);
+      musicButton = this.add.sprite(530,610, 'BM_5F').setScale(0.16);
       musicButton.setOrigin(0.5,0.5);
     }
 
@@ -124,28 +128,6 @@ export class Menu extends Phaser.Scene {
     })
   }
 
-  myIP(){
-
-    var ip = false;
-    window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection || false;
-
-    if (window.RTCPeerConnection){
-      ip = [];
-      var pc = new RTCPeerConnection({iceServers:[]}), noop = function(){};
-      pc.createDataChannel('');
-      pc.createOffer(pc.setLocalDescription.bind(pc), noop);
-
-      pc.onicecandidate = function(event){
-        if (event && event.candidate && event.candidate.candidate){
-          var s = event.candidate.candidate.split('\n');
-          ip.push(s[0].split(' ')[4]);
-        }
-      }
-    }
-
-    return ip;
-  }
-
   playMenu(){
 
     this.disableButtons();
@@ -172,10 +154,10 @@ export class Menu extends Phaser.Scene {
 
     this.disableButtons();
 
-    var leader_panel = this.add.sprite(360, 580, 'Leaderboard_panel').setScale(3);
+    var leader_panel = this.add.sprite(360, 640, 'PM_3LD').setScale(1);
     leader_panel.setOrigin(0.5,0.5);
 
-    var exit_panel =  this.add.sprite(leader_panel.x + 250, leader_panel.y - 450, 'Exit').setScale(1);
+    var exit_panel =  this.add.sprite(leader_panel.x + 200, leader_panel.y - 500, 'BM_GEXB').setScale(0.2);
     exit_panel.setInteractive();
     exit_panel.setOrigin(0.5,0.5);
 
@@ -190,10 +172,10 @@ export class Menu extends Phaser.Scene {
 
     this.disableButtons();
 
-    var instruksi_panel = this.add.sprite(360, 580, 'Instruksi_panel').setScale(3);
+    var instruksi_panel = this.add.sprite(360, 640, 'PM_1I').setScale(1);
     instruksi_panel.setOrigin(0.5,0.5);
 
-    var exit_panel =  this.add.sprite(instruksi_panel.x + 250, instruksi_panel.y - 450, 'Exit').setScale(1);
+    var exit_panel =  this.add.sprite(instruksi_panel.x + 200, instruksi_panel.y - 495, 'BM_GEXB').setScale(0.2);
     exit_panel.setInteractive();
     exit_panel.setOrigin(0.5,0.5);
 
@@ -208,10 +190,10 @@ export class Menu extends Phaser.Scene {
 
     this.disableButtons();
 
-    var tnc_panel = this.add.sprite(360,580, 'TNC_panel').setScale(3);
+    var tnc_panel = this.add.sprite(360,640, 'PM_2TC').setScale(1, 0.9);
     tnc_panel.setOrigin(0.5, 0.5);
 
-    var exit_panel =  this.add.sprite(tnc_panel.x + 250, tnc_panel.y - 450, 'Exit').setScale(1);
+    var exit_panel =  this.add.sprite(tnc_panel.x + 200, tnc_panel.y - 450, 'BM_GEXB').setScale(0.2);
     exit_panel.setInteractive();
     exit_panel.setOrigin(0.5,0.5);
 
@@ -227,33 +209,33 @@ export class Menu extends Phaser.Scene {
     if(musicStatus == true){
 
       musicStatus = false;
-      musicButton.setTexture('music_on');
-      musicButton.setScale(0.2);
+      musicButton.setTexture('BM_5N');
+      musicButton.setScale(0.16);
     }
     else{
-      
+
       musicStatus = true;
-      musicButton.setTexture('music_off');
-      musicButton.setScale(0.2);
+      musicButton.setTexture('BM_5F');
+      musicButton.setScale(0.16);
     }
   }
 
   disableButtons(){
 
-    playButton.disableInteractive();
-    leaderButton.disableInteractive();
-    instruksiButton.disableInteractive();
-    tncButton.disableInteractive();
-    //musicbutton.disableInteractive();
+    challengeGate.disableInteractive();
+    challengerListSign.disableInteractive();
+    challengerGuideSign.disableInteractive();
+    challengerContract.disableInteractive();
+    musicButton.disableInteractive();
   }
 
   activateButtons(){
 
-    playButton.setInteractive();
-    leaderButton.setInteractive();
-    instruksiButton.setInteractive();
-    tncButton.setInteractive();
-    //musicbutton.setInteractive();
+    challengeGate.setInteractive();
+    challengerListSign.setInteractive();
+    challengerGuideSign.setInteractive();
+    challengerContract.setInteractive();
+    musicButton.setInteractive();
   }
 
 
