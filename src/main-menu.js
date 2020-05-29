@@ -1,11 +1,21 @@
 import Phaser from 'phaser';
 
+var preload;
 var challengeGate;
 var challengerListSign;
 var challengerGuideSign;
 var challengerContract;
-var musicButton;
+var musicToggle;
 var musicStatus;
+var menuSound;
+var poinPayOption;
+var adWatchPayOption;
+var availableButton = [];
+
+var userData = {};
+var videoProp = {};
+
+var CryptoJS = require('crypto-js');
 
 export class Menu extends Phaser.Scene {
 
@@ -14,24 +24,25 @@ export class Menu extends Phaser.Scene {
     super("MainMenu")
   }
 
+  init(data){
+    if(musicStatus === undefined){
+      musicStatus = true;
+    }
+    else {
+      musicStatus = data.sound_status
+    }
+    menuSound = this.sound.add('MENU_SOUND')
+    menuSound.loop = true;
+    menuSound.play();
+  }
+
   preload(){
 
-    this.load.image('TITLE', 'src/assets/LOGO.png');
-    this.load.image('MENU_BG', 'src/assets/MENU_BG.jpg');
-    this.load.image('ad_button','./src/assets/ad_button.png');
-    this.load.image('BM_1P', './src/assets/BM_1P.png');
-    this.load.image('BM_2I','./src/assets/BM_2I.png');
-    this.load.image('BM_3TC','./src/assets/BM_3TC.png');
-    this.load.image('BM_4LD','./src/assets/BM_4LD.png');
-    this.load.image('BM_5N','./src/assets/BM_5N.png');
-    this.load.image('BM_5F','./src/assets/BM_5F.png');
-    this.load.image("BM_GEXB",'./src/assets/BM_GEXB.png');
-    this.load.image('PM_1I','./src/assets/PM_1I.png');
-    this.load.image('PM_2TC','./src/assets/PM_2TC.png');
-    this.load.image('PM_3LD','./src/assets/PM_3LD.png');
   }
 
   create(){
+
+    this.challengersInfo();
 
     var background = this.add.sprite(360, 1280, 'MENU_BG').setScale(0.68, 0.67)
     background.setOrigin(0.5, 1);
@@ -39,41 +50,42 @@ export class Menu extends Phaser.Scene {
     var title = this.add.sprite(360, 230, 'TITLE').setScale(0.5)
     title.setOrigin(0.5, 0.5);
 
-    challengeGate = this.add.sprite(360, 530, 'BM_1P').setScale(0.23);
+    challengeGate = this.add.sprite(360, 600, 'BM_1P').setScale(0.23);
     challengeGate.setOrigin(0.5, 0.5);
-    challengeGate.setInteractive();
-    challengeGate.on('pointerdown', () => this.playMenu())
+    challengeGate.on('pointerdown', () => this.conditionChecking())
 
-    challengerListSign = this.add.sprite(440, 700, 'BM_4LD').setScale(0.16);
+    challengerListSign = this.add.sprite(430, 770, 'BM_4LD').setScale(0.16);
     challengerListSign.setOrigin(0.5,0.5);
-    challengerListSign.setInteractive();
-    challengerListSign.on("pointerdown",() => this.leaderMenu())
+    challengerListSign.on("pointerdown",() => this.showChallengersBoard())
 
-    challengerGuideSign = this.add.sprite(200, 620, 'BM_2I').setScale(0.16);
+    challengerGuideSign = this.add.sprite(190, 670, 'BM_2I').setScale(0.16);
     challengerGuideSign.setOrigin(0.5,0.5);
-    challengerGuideSign.setInteractive();
-    challengerGuideSign.on("pointerdown",() => this.instructionMenu())
+    challengerGuideSign.on("pointerdown",() => this.showTheGuidance())
 
-    challengerContract = this.add.sprite(300, challengerListSign.y + 30, 'BM_3TC').setScale(0.16);
+    challengerContract = this.add.sprite(300, challengerListSign.y, 'BM_3TC').setScale(0.16);
     challengerContract.setOrigin(0.5,0.5);
-    challengerContract.setInteractive();
-    challengerContract.on("pointerdown",() => this.tncMenu())
+    challengerContract.on("pointerdown",() => this.showTheContract())
 
-    musicStatus = true;
-
-    if(musicStatus==true){
-
-      musicButton = this.add.sprite(530,610, 'BM_5N').setScale(0.16);
-      musicButton.setOrigin(0.5,0.5);
+    if(musicStatus === true){
+      menuSound.setMute(false)
+      musicToggle = this.add.sprite(530, challengerGuideSign.y, 'BM_5N').setScale(0.16);
+      musicToggle.setOrigin(0.5,0.5);
     }
     else{
-
-      musicButton = this.add.sprite(530,610, 'BM_5F').setScale(0.16);
-      musicButton.setOrigin(0.5,0.5);
+      menuSound.setMute(true)
+      musicToggle = this.add.sprite(530, challengerGuideSign.y, 'BM_5F').setScale(0.16);
+      musicToggle.setOrigin(0.5,0.5);
     }
 
-    musicButton.setInteractive();
-    musicButton.on('pointerdown', () => this.disableMusic());
+    musicToggle.on('pointerdown', () => this.disableMusic());
+
+    this.game.events.on('hidden',function(){
+      menuSound.setMute(true);
+    },this);
+
+    this.game.events.on('visible', function(){
+      menuSound.setMute(false);
+    });
   }
 
   update(){
@@ -81,162 +93,792 @@ export class Menu extends Phaser.Scene {
 
   }
 
-  playAd(){
+  conditionChecking(){
 
-    let video = document.createElement('video');
-    let element;
+    this.disableButtons()
+    if(userData.free_chance != 0){
+      let timeStart = new Date()
+      this.beatTheGame(timeStart, true)
+    }
+    else {
+      this.showPaymentOption(10)
+      // availableButton = [poinPayOption, adWatchPayOption, challengerListSign, challengerGuideSign, challengerContract, musicToggle]
+      // this.activateButtons();
+    }
+  }
 
-    video.src = 'http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4';
-    video.playsinline = true;
-    video.width = 720;
-    video.height = 1280;
-    video.autoplay = true;
+  showPaymentOption(required){
 
-    video.addEventListener('play', (event) => {
+    let optionBox = this.add.sprite(360, 640, 'PM_PY').setScale(0.5, 0.6);
+    optionBox.setOrigin(0.5, 0.5);
 
-      element = this.add.dom(360, 640, video, {
+    let changeMind = this.add.sprite(600, 470, 'BM_GEXB').setScale(0.15);
+    changeMind.setOrigin(0.5, 0.5);
+    changeMind.setInteractive();
+    changeMind.on('pointerdown', () => {
+      poinPayOption.destroy();
+      adWatchPayOption.destroy();
+      optionBox.destroy();
+      changeMind.destroy();
+      this.activateButtons()
+    })
+
+    poinPayOption = this.add.sprite(240, 640, 'BM_1BPP'+required).setScale(0.16);
+    poinPayOption.setOrigin(0.5,0.5);
+    poinPayOption.setInteractive();
+    poinPayOption.on('pointerdown', () => {
+      poinPayOption.disableInteractive()
+      adWatchPayOption.disableInteractive()
+      changeMind.disableInteractive()
+      if(userData.poin < required){
+        this.showDisclaimer('DM_PW', 0.5)
+      }
+      else {
+        this.showPayConfirmation('DM_PP'+required, 0.52, changeMind)
+      }
+    })
+
+    adWatchPayOption = this.add.sprite(480, poinPayOption.y, 'BM_1AAD').setScale(0.16);
+    adWatchPayOption.setOrigin(0.5,0.5);
+    adWatchPayOption.setInteractive();
+    adWatchPayOption.on("pointerdown",() => {
+      poinPayOption.disableInteractive()
+      adWatchPayOption.disableInteractive()
+      changeMind.disableInteractive()
+      this.adVideoSource()
+    })
+  }
+
+  showTheAd(){
+
+    //this.adVideoSource();
+
+    let timerEvent;
+    let timer = videoProp.duration
+    let advideoTimer
+    let adContentEl = document.createElement('video');
+    let adHeaderEl = document.createElement('img');
+    let adContentDom;
+    let adHeaderDom;
+    let adHeaderImgDom;
+
+    adContentEl.src = videoProp.main_source;
+    adContentEl.playsinline = true;
+    adContentEl.width = 720;
+    adContentEl.height = 1280;
+    adContentEl.autoplay = true;
+
+    adHeaderEl.src = videoProp.head_source;
+    adHeaderEl.width = 300;
+    adHeaderEl.height = 70;
+
+    adContentEl.addEventListener('play', (event) => {
+
+      adContentDom = this.add.dom(360, 640, adContentEl, {
         'background-color': 'black'
       });
-    })
+      adHeaderDom = this.add.dom(360, 360, 'div', {
+        'background-color' : videoProp.background_color,
+        'width' : '720px',
+        'height' : '170px'
+      }).setDepth(1);
+      adHeaderImgDom = this.add.dom(360, 360, adHeaderEl).setDepth(1);
 
-    video.addEventListener('ended', (event) => {
+      advideoTimer = this.add.dom(680, 10, 'p', {
+        'font-family' : 'Arial',
+        'font-size' : '2.1em',
+        'color' : 'white'
+      }, '').setDepth(1)
 
-      element.destroy();
-      //video.destroy();
-      this.scene.start("PlayGame");
+      timerEvent = this.time.addEvent({
+        delay: 1000,
+        callback: function(){
+          timer--
+          advideoTimer.setText(timer)
+
+          if(timer === 0){
+            advideoTimer.destroy()
+            timerEvent.remove(false);
+          }
+        },
+        loop: true
+      })
+
+      adContentEl.addEventListener('ended', (event) => {
+        let timeStart = new Date()
+        this.beatTheGame(timeStart, false);
+      })
     })
   }
 
-  getVideoSource(){
+  showPayConfirmation(asset, size, etc){
 
-    fetch('https://linipoin-api.macroad.co.id/api/v1.0/leaderboard/leaderboard_imlek?limit_highscore=5&limit_total_score=5&linigame_platform_token=66cfbe9876ff5097bc861dc8b8fce03ccfe3fb43',{
+    //this.disableButtons()
+    poinPayOption.disableInteractive()
+    adWatchPayOption.disableInteractive()
 
-      method:'GET'
-    }).then(response => {
+    let confirmationBoard = this.add.sprite(360, 640, asset).setScale(size);
+    confirmationBoard.setOrigin(0.5, 0.5)
+    confirmationBoard.setDepth(1)
 
-      if(response.ok){
+    let confirmChoice = this.add.sprite(280, 810, 'BM_CPP').setScale(0.15);
+    confirmChoice.setOrigin(0.5, 0.5);
+    confirmChoice.setDepth(1)
+    confirmChoice.setInteractive();
+    confirmChoice.on('pointerdown', () => {
 
-        return response.json()
+      this.preloadAnimation(360, 490, 1.0, 8, 'PRE_ANIM1');
+      let timeStart;
+      timeStart = new Date();
+      this.beatTheGame(timeStart, true)
+      confirmChoice.disableInteractive();
+    });
+
+    let denyChoice = this.add.sprite(445, 810, 'BM_DPP').setScale(0.15);
+    denyChoice.setOrigin(0.5, 0.5);
+    denyChoice.setDepth(1)
+    denyChoice.setInteractive();
+    denyChoice.on('pointerdown', () => {
+
+      poinPayOption.setInteractive()
+      adWatchPayOption.setInteractive()
+
+      confirmationBoard.destroy();
+      confirmChoice.destroy();
+      denyChoice.destroy();
+      etc.setInteractive();
+      //this.activateButtons()
+    });
+  }
+
+  showDisclaimer(asset, size){
+
+    this.disableButtons()
+
+    let warningPopUp = this.add.sprite(360, 640, asset).setScale(size);
+    warningPopUp.setOrigin(0.5, 0.5);
+    warningPopUp.setDepth(1);
+
+    if(asset === 'DM_PW'){
+      let closeIt = this.add.sprite(520, 380, 'BM_GEXB').setScale(0.2);
+      closeIt.setOrigin(0.5, 0.5);
+      closeIt.setDepth(1);
+      closeIt.setInteractive();
+      closeIt.on('pointerdown', () => {
+
+        warningPopUp.destroy();
+        closeIt.destroy();
+        this.activateButtons();
+      });
+    }
+  }
+
+  showChallengersBoard(){
+
+    this.disableButtons();
+    let idHigh = [];
+    let idCum = [];
+    let scoreHigh = [];
+    let scoreCum = [];
+    let rankHSData = {};
+    let rankTSData = {};
+
+    let urlParams = new URLSearchParams(window.location.search);
+    let userSession = urlParams.get('session');
+
+    var bestChallengerBoard = this.add.sprite(360, 640, 'PM_3LD').setScale(1);
+    bestChallengerBoard.setOrigin(0.5,0.5);
+
+    var imDone =  this.add.sprite(bestChallengerBoard.x + 200, bestChallengerBoard.y - 500, 'BM_GEXB').setScale(0.2);
+    imDone.setInteractive();
+    imDone.setOrigin(0.5,0.5);
+
+    this.challengerListing(idHigh, idCum, scoreHigh, scoreCum);
+    this.challengerMilestone(userSession, rankHSData, rankTSData);
+
+    imDone.on('pointerdown',() => {
+      idHigh.forEach((hText) => {
+        hText.destroy()
+      })
+      idCum.forEach((cText) => {
+        cText.destroy()
+      })
+      scoreHigh.forEach((hText) => {
+        hText.destroy()
+      })
+      scoreCum.forEach((cText) => {
+        cText.destroy()
+      })
+      for(let key in rankHSData){
+        rankHSData[key].destroy()
       }
-      throw new Error(response.status)
-    }).then(data => {
-
-      console.log(data.result);
-    }).catch(error => {
-
-      console.error(error.message);
-    })
-  }
-
-  playMenu(){
-
-    this.disableButtons();
-    var panelGameOptions = this.add.sprite(360,550, 'panel').setScale(1.4);
-    var realPlayButton = this.add.sprite(panelGameOptions.x + 170, panelGameOptions.y-30, 'play_button').setScale(0.08);
-    var realAdButton = this.add.sprite(panelGameOptions.x - 170, panelGameOptions.y-30, 'ad_button').setScale(0.35);
-
-    panelGameOptions.setOrigin(0.5,0.5);
-    realPlayButton.setOrigin(0.5,0.5);
-    realAdButton.setOrigin(0.5,0.5);
-
-    realAdButton.setInteractive();
-    realAdButton.on("pointerdown",() => this.playAd())
-
-    realPlayButton.setInteractive();
-    realPlayButton.on('pointerdown', () => {
-
-      this.scene.start('PlayGame');
-    })
-  }
-
-
-  leaderMenu(){
-
-    this.disableButtons();
-
-    var leader_panel = this.add.sprite(360, 640, 'PM_3LD').setScale(1);
-    leader_panel.setOrigin(0.5,0.5);
-
-    var exit_panel =  this.add.sprite(leader_panel.x + 200, leader_panel.y - 500, 'BM_GEXB').setScale(0.2);
-    exit_panel.setInteractive();
-    exit_panel.setOrigin(0.5,0.5);
-
-    exit_panel.on('pointerdown',() => {
-      leader_panel.destroy();
-      exit_panel.destroy();
+      for(let key in rankTSData){
+        rankTSData[key].destroy()
+      }
+      bestChallengerBoard.destroy();
+      imDone.destroy();
       this.activateButtons();
     })
   }
 
-  instructionMenu(){
+  showTheGuidance(){
 
     this.disableButtons();
+    var contentText = [
+      '1.\nTap layar untuk menjatuhkan box\n',
+      '2.\nSusun box di area permainan untuk mendapatkan skor, box yang jatuh di luar area permainan tidak mendapatkan skor\n',
+      '3.\nPerhitungan skor dilakukan setelah permainan selesai pada detik ke-30\n',
+      '4.\nSetiap box pada susunan tingkat pertama akan mendapatkan 1 (satu) poin, Setiap box pada susunan tingkat kedua akan mendapatkan 2 (dua) poin, dan berlaku seterusnya'
+    ]
 
-    var instruksi_panel = this.add.sprite(360, 640, 'PM_1I').setScale(1);
-    instruksi_panel.setOrigin(0.5,0.5);
+    var guidanceBoard = this.add.sprite(360, 640, 'PM_1I').setScale(1);
+    guidanceBoard.setOrigin(0.5,0.5);
 
-    var exit_panel =  this.add.sprite(instruksi_panel.x + 200, instruksi_panel.y - 495, 'BM_GEXB').setScale(0.2);
-    exit_panel.setInteractive();
-    exit_panel.setOrigin(0.5,0.5);
+    var imDone =  this.add.sprite(guidanceBoard.x + 200, guidanceBoard.y - 495, 'BM_GEXB').setScale(0.2);
+    imDone.setInteractive();
+    imDone.setOrigin(0.5,0.5);
 
-    exit_panel.on('pointerdown',() => {
-      instruksi_panel.destroy();
-      exit_panel.destroy();
+    var guideText = this.add.text(360, 620, contentText, {
+
+      font: '26px HelveticaRoundedLTStd',
+      fill: '#84446D',
+      align: 'center',
+      wordWrap: {
+        width: 490
+      }
+    }).setOrigin(0.5, 0.5)
+
+    imDone.on('pointerdown',() => {
+      guidanceBoard.destroy();
+      guideText.destroy();
+      imDone.destroy();
       this.activateButtons();
     })
   }
 
-  tncMenu(){
+  showTheContract(){
 
     this.disableButtons();
 
-    var tnc_panel = this.add.sprite(360,640, 'PM_2TC').setScale(1, 0.9);
-    tnc_panel.setOrigin(0.5, 0.5);
+    let page1 = [
+      "1. Pemain akan mendapatkan 3 (tiga)",
+      "    kali token gratis untuk bermain",
+      "    setiap harinya (selama periode",
+      "    event berlangsung)",
+      "2. Pemain yang ingin bermain lebih",
+      "    dari 3x per hari akan diwajibkan",
+      "    melihat tayangan iklan atau",
+      "    dapat menukarkan 10 poin dari",
+      "    LINIPOIN",
+      "3. Pemain yang berhasil meletakkan",
+      "    kotak pada tempat yg disediakan",
+      "    akan mendapatkan poin berdasarkan" ,
+      "    tingkatan tumpukan kotak",
+      "4. Poin yang didapat dari setiap akhir",
+      "    permainan akan langsung",
+      "    ditambahkan ke akumulasi poin",
+      "    pada LINIPOIN anda masing-masing.",
+      "5. LINIPOIN dengan dan/atau tanpa",
+      "    pemberitahuan sebelumnya berhak",
+      "    secara sepihak membatalkan",
+      "    pemenang dan pemberian hadiah",
+    ]
+    let page2 = [
+      "    event yang merugikan pihak",
+      "    LINIPOIN termasuk namun tidak",
+      "    terbatas pada:",
+      "     * Penggunaan lebih dari 1 (satu)",
+      "        akun oleh 1 (satu) Customer",
+      "        atau kelompok yang sama,",
+      "        dan/atau",
+      "     * Identitas pemilik akun yang",
+      "        sama, dan/atau",
+      "     * Nomor handphone yang sama,",
+      "        dan/atau",
+      "     * Alamat pengiriman yang sama,",
+      "        dan/atau",
+      "     * Nomor rekening/kartu kredit/",
+      "        debit/identitas pembayaran",
+      "        yang sama, dan/atau",
+      "     * Riwayat transaksi yang sama,",
+      "        dan/atau",
+      "6. Jika ada pertanyaan lebih lanjut",
+      "    silahkan ajukan ke Pusat Bantuan,",
+      "    DM via Instagram @linipoin.id atau",
+      "    email ke info@linipoin.com"
+    ]
 
-    var exit_panel =  this.add.sprite(tnc_panel.x + 200, tnc_panel.y - 450, 'BM_GEXB').setScale(0.2);
-    exit_panel.setInteractive();
-    exit_panel.setOrigin(0.5,0.5);
+    let tncContent = [page1, page2]
+    let selector = 0
 
-    exit_panel.on('pointerdown',() => {
-      tnc_panel.destroy();
-      exit_panel.destroy();
+    var contractBoard = this.add.sprite(360,640, 'PM_2TC').setScale(1, 0.9);
+    contractBoard.setOrigin(0.5, 0.5);
+
+    let text = this.add.text(370, 640, tncContent[selector], {
+      font: '23px HelveticaRoundedLTStd',
+      color: '#606060',
+      align: 'left',
+      wordWrap: {
+        width: 500
+      }
+    }).setOrigin(0.5, 0.5);
+
+    let nextPage = this.add.sprite(470, 1010, 'BM_NEXT').setScale(0.12)
+    nextPage.setOrigin(0.5, 0.5);
+    nextPage.setInteractive()
+    nextPage.on('pointerdown', () => {
+      if(selector >= tncContent.length - 1){
+        selector = tncContent.length - 1
+      }
+      else {
+        selector += 1
+      }
+      text.setText(tncContent[selector]);
+    })
+
+    let prevPage = this.add.sprite(250, 1010, 'BM_PREV').setScale(0.12)
+    prevPage.setOrigin(0.5, 0.5);
+    prevPage.setInteractive()
+    prevPage.on('pointerdown', () => {
+      if(selector <= 0){
+        selector = 0
+      }
+      else {
+        selector -= 1
+      }
+      text.setText(tncContent[selector]);
+    })
+
+    var imDone =  this.add.sprite(contractBoard.x + 200, contractBoard.y - 450, 'BM_GEXB').setScale(0.2);
+    imDone.setInteractive();
+    imDone.setOrigin(0.5,0.5);
+
+    imDone.on('pointerdown',() => {
+      contractBoard.destroy();
+      text.destroy();
+      nextPage.destroy();
+      prevPage.destroy();
+      imDone.destroy();
       this.activateButtons();
     })
+  }
+
+  preloadAnimation(xPos, yPos, size, maxFrame, assetKey){
+
+    preload = this.add.sprite(xPos, yPos, assetKey).setOrigin(0.5 ,0.5);
+    preload.setScale(size);
+    preload.setDepth(1);
+
+    this.anims.create({
+      key: assetKey,
+      frames: this.anims.generateFrameNumbers(assetKey, {
+        start: 1,
+        end: maxFrame
+      }),
+      frameRate: 20,
+      repeat: -1
+    });
+
+    preload.anims.play(assetKey, true);
   }
 
   disableMusic(){
-
     if(musicStatus == true){
-
+      menuSound.setMute(true)
       musicStatus = false;
-      musicButton.setTexture('BM_5N');
-      musicButton.setScale(0.16);
+      musicToggle.setTexture('BM_5F');
+      musicToggle.setScale(0.16);
     }
     else{
-
+      menuSound.setMute(false);
       musicStatus = true;
-      musicButton.setTexture('BM_5F');
-      musicButton.setScale(0.16);
+      musicToggle.setTexture('BM_5N');
+      musicToggle.setScale(0.16);
     }
   }
 
   disableButtons(){
-
-    challengeGate.disableInteractive();
-    challengerListSign.disableInteractive();
-    challengerGuideSign.disableInteractive();
-    challengerContract.disableInteractive();
-    musicButton.disableInteractive();
+    availableButton.forEach((button) => {
+      button.disableInteractive()
+    })
   }
 
   activateButtons(){
-
-    challengeGate.setInteractive();
-    challengerListSign.setInteractive();
-    challengerGuideSign.setInteractive();
-    challengerContract.setInteractive();
-    musicButton.setInteractive();
+    availableButton.forEach((button) => {
+      button.setInteractive()
+    })
   }
 
+  beatTheGame(begin, isPoinPay){
 
+    let urlParams = new URLSearchParams(window.location.search);
+    let userSession = urlParams.get('session');
+    let requestID = CryptoJS.AES.encrypt('LG'+'+78709ab074f9ec4a3e66c6c556ac8c96576699f2+'+Date.now(), 'c0dif!#l1n!9am#enCr!pto9r4pH!*').toString()
+    let dataID;
+    let data = {
+      linigame_platform_token: '78709ab074f9ec4a3e66c6c556ac8c96576699f2',
+      session: userSession,
+      game_start: begin,
+      score: 0,
+      user_highscore: 0,
+      total_score: 0,
+    }
+    let datas
+
+    if(isPoinPay === true){
+      data.play_video = 'not_played'
+      //console.log(data);
+      datas = {
+        datas: CryptoJS.AES.encrypt(JSON.stringify(data), 'c0dif!#l1n!9am#enCr!pto9r4pH!*').toString()
+      }
+    }
+    else {
+      data.play_video = 'full_played'
+      //console.log(data);
+      datas = {
+        datas: CryptoJS.AES.encrypt(JSON.stringify(data), 'c0dif!#l1n!9am#enCr!pto9r4pH!*').toString()
+      }
+    }
+
+    fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/stacko?lang=id", {
+    //fetch("https://fb746e70.ngrok.io/api/v1.0/leaderboard/stacko?lang=id", {
+
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'request-id' : requestID
+      },
+      body: JSON.stringify(datas)
+    }).then(response => {
+
+      if(!response.ok){
+        return response.json().then(error => Promise.reject(error));
+      }
+      else {
+        return response.json();
+      }
+
+    }).then(data => {
+
+      //console.log(data.result);
+      dataID = data.result.id
+      if(dataID !== undefined){
+        this.scene.start("PlayGame", {
+          session: userSession,
+          id: dataID,
+          sound_status: musicStatus,
+          game_score: userData.rule_score
+        });
+      }
+
+    }).catch(error => {
+
+      //console.log(error.result);
+    });
+  }
+
+  challengersInfo(){
+
+    this.preloadAnimation(360, 450, 0.6, 13, 'PRE_ANIM2');
+    this.disableButtons();
+
+    let urlParams = new URLSearchParams(window.location.search);
+    let userSession = urlParams.get('session');
+
+    let data = {
+      datas : CryptoJS.AES.encrypt(JSON.stringify({
+        session: userSession,
+        linigame_platform_token: '78709ab074f9ec4a3e66c6c556ac8c96576699f2'
+      }), 'c0dif!#l1n!9am#enCr!pto9r4pH!*').toString()
+    }
+
+    fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/check_user_limit/", {
+    //fetch("https://fb746e70.ngrok.io/api/v1.0/leaderboard/check_user_limit/", {
+
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    }).then(response => {
+
+      if(!response.ok){
+        return response.json().then(error => Promise.reject(error));
+      }
+      else {
+        return response.json();
+      }
+
+    }).then(data => {
+
+      //console.log(data.result);
+      if(data.result.isEmailVerif === true){
+        userData = {
+          rule_score: data.result.gamePoin,
+          free_chance : data.result.lifePlay,
+          poin: data.result.userPoin,
+          phone: '0' + data.result.phone_number.substring(3),
+          email: data.result.email,
+          date_birth: data.result.dob,
+          gender: data.result.gender === 'm' ? 'male' : 'female'
+        }
+        //this.conditionChecking();
+        let startPos = 290
+        for(let i = 1; i <= userData.free_chance; i++){
+          if(i == 1){
+            startPos += 0;
+          }
+          else {
+            startPos += 70;
+          }
+          let life = this.add.image(startPos, 450, 'LIFE').setScale(0.17);
+          life.setOrigin(0.5, 0.5);
+        }
+
+        availableButton = [challengeGate, challengerListSign, challengerGuideSign, challengerContract, musicToggle]
+        preload.destroy();
+        this.activateButtons();
+      }
+      else {
+        this.showDisclaimer('WM_EVW', 0.5)
+      }
+
+    }).catch(error => {
+
+      //console.log(error);
+      this.showDisclaimer('WM_SE', 0.5)
+    });
+  }
+
+  challengerListing(hID, cID, hSC, cSC){
+
+    let startPosH = 355
+    let startPosC = 660
+    this.preloadAnimation(360, 690, 1.2, 8, 'PRE_ANIM1');
+
+    //fetch("https://linipoin-api.macroad.co.id/api/v1.0/leaderboard/leaderboard_imlek?limit_highscore=5&limit_total_score=5&linigame_platform_token=891ff5abb0c27161fb683bcaeb1d73accf1c9c5e", {
+    fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/leaderboard_imlek?limit_highscore=5&limit_total_score=5&linigame_platform_token=891ff5abb0c27161fb683bcaeb1d73accf1c9c5e", {
+
+      method: "GET",
+    }).then(response => {
+
+      if(!response.ok){
+        return response.json().then(error => Promise.reject(error));
+      }
+      else {
+        return response.json();
+      }
+
+    }).then(data => {
+
+      //console.log(data.result);
+      for (let i in data.result.highscore_leaderboard){
+        let uNameHi = data.result.highscore_leaderboard[i]["user.name"] !== null ? data.result.highscore_leaderboard[i]["user.name"]: 'No Name';
+
+        if(i == 0){
+          startPosH += 0
+        }
+        else {
+          startPosH += 40
+        }
+
+        let shortHID = uNameHi.length > 16 ? uNameHi.substring(0, 16)+'...' : uNameHi
+        hID[i] = this.add.text(170, startPosH, ''+shortHID, {
+          font: '23px HelveticaRoundedLTStd',
+          fill: '#84446D',
+          align: 'left'
+        }).setOrigin(0, 0.5);
+
+        hSC[i] = this.add.text(550, startPosH, ''+data.result.highscore_leaderboard[i].user_highscore, {
+          font: '23px HelveticaRoundedLTStd',
+          fill: '#84446D',
+          align: 'right'
+        }).setOrigin(1, 0.5);
+      }
+
+      for(let i in data.result.totalscore_leaderboard){
+        let uNameCum = data.result.totalscore_leaderboard[i]["user.name"] !== null ? data.result.totalscore_leaderboard[i]["user.name"]: 'No Name';
+
+        if(i == 0){
+          startPosC += 0
+        }
+        else {
+          startPosC += 40
+        }
+
+        let shortCID = uNameCum.length > 16 ? uNameCum.substring(0, 16)+'...' : uNameCum
+        cID[i] = this.add.text(170, startPosC, ''+shortCID, {
+          font: '23px HelveticaRoundedLTStd',
+          fill: '#84446D',
+          align: 'left'
+        }).setOrigin(0, 0.5);
+
+        cSC[i] = this.add.text(550, startPosC, ''+data.result.totalscore_leaderboard[i].total_score, {
+          font: '23px HelveticaRoundedLTStd',
+          fill: '#84446D',
+          align: 'left'
+        }).setOrigin(1, 0.5);
+      }
+
+    }).catch(error => {
+
+      //console.log(error.result);
+    });
+  }
+
+  challengerMilestone(sess, rHData, rTData){
+
+    let rankPosConfig = {
+      high_score: {
+        x: 160,
+        y: 965
+      },
+      total_score: {
+        x: 160,
+        y: 1010,
+      }
+    }
+
+    fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/get_user_rank/?session="+sess+"&limit=5&linigame_platform_token=78709ab074f9ec4a3e66c6c556ac8c96576699f2", {
+    //fetch("https://fb746e70.ngrok.io/api/v1.0/leaderboard/check_user_limit/", {
+
+      method: "GET",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    }).then(response => {
+
+      if(!response.ok){
+        return response.json().then(error => Promise.reject(error));
+      }
+      else {
+        return response.json();
+      }
+
+    }).then(data => {
+
+      //console.log(data.result);
+      if(data.result.rank_high_score === '-'){
+        rHData.rank = this.add.text(rankPosConfig.high_score.x, rankPosConfig.high_score.y, ''+data.result.rank_high_score, {
+          font: '28px HelveticaRoundedLTStd',
+          fill: '#84446D',
+          align: 'left'
+        }).setOrigin(0, 0.5)
+        rHData.score = this.add.text(rankPosConfig.high_score.x + 390, rankPosConfig.high_score.y, '0', {
+          font: '25px HelveticaRoundedLTStd',
+          fill: '#84446D',
+          align: 'right'
+        }).setOrigin(1, 0.5)
+      }
+      else {
+        rHData.rank = this.add.text(rankPosConfig.high_score.x, rankPosConfig.high_score.y, '#'+data.result.rank_high_score.ranking, {
+          font: '26px HelveticaRoundedLTStd',
+          fill: '#84446D',
+          align: 'left'
+        }).setOrigin(0, 0.5)
+        rHData.score = this.add.text(rankPosConfig.high_score.x + 390, rankPosConfig.high_score.y, ''+data.result.rank_high_score.user_highscore, {
+          font: '25px HelveticaRoundedLTStd',
+          fill: '#84446D',
+          align: 'right'
+        }).setOrigin(1, 0.5)
+      }
+
+      if(data.result.rank_total_score === '-'){
+        rTData.rank = this.add.text(rankPosConfig.total_score.x, rankPosConfig.total_score.y, ''+data.result.rank_total_score, {
+          font: '28px HelveticaRoundedLTStd',
+          fill: '#84446D',
+          align: 'left'
+        }).setOrigin(0, 0.5)
+        rTData.score = this.add.text(rankPosConfig.total_score.x + 390, rankPosConfig.total_score.y, '0', {
+          font: '25px HelveticaRoundedLTStd',
+          fill: '#84446D',
+          align: 'right'
+        }).setOrigin(1, 0.5)
+      }
+      else {
+        rTData.rank = this.add.text(rankPosConfig.total_score.x, rankPosConfig.total_score.y, '#'+data.result.rank_total_score.ranking, {
+          font: '26px HelveticaRoundedLTStd',
+          fill: '#84446D',
+          align: 'left'
+        }).setOrigin(0, 0.5)
+        rTData.score = this.add.text(rankPosConfig.total_score.x + 390, rankPosConfig.total_score.y, ''+data.result.rank_total_score.user_total_score, {
+          font: '25px HelveticaRoundedLTStd',
+          fill: '#84446D',
+          align: 'right'
+        }).setOrigin(1, 0.5)
+      }
+
+      preload.destroy();
+    }).catch(error => {
+
+      //console.log(error);
+    });
+  }
+
+  adVideoSource(){
+
+    this.connectToSource();
+
+    this.showDisclaimer('DM_ADL', 0.5)
+    this.preloadAnimation(360, 680, 1.3, 8, 'PRE_ANIM1');
+    //this.disableButtons()
+    fetch('https://captive-dev.macroad.co.id/api/v2/linigames/advertisement?email='+userData.email+'&dob='+userData.date_birth+'&gender='+userData.gender+'&phone_number='+userData.phone,{
+
+      method:'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    }).then(response => {
+
+      if(!response.ok){
+        return response.json().then(error => Promise.reject(error));
+      }
+      else {
+        return response.json();
+      }
+    }).then(data => {
+
+      //console.log(data.result);
+      videoProp = {
+        main_source: data.result.main_source,
+        head_source: data.result.header_source,
+        duration: data.result.duration,
+        background_color: data.result.header_bg_color
+      }
+
+      this.showTheAd();
+    }).catch(error => {
+
+      console.error(error);
+    })
+  }
+
+  connectToSource(){
+
+    fetch('https://captive-dev.macroad.co.id/api/v2/linigames/advertisement/connect/53?email='+userData.email+'&dob='+userData.date_birth+'&gender='+userData.gender+'&phone_number='+userData.phone,{
+
+      method:'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    }).then(response => {
+
+      if(!response.ok){
+        return response.json().then(error => Promise.reject(error));
+      }
+      else {
+        return response.json();
+      }
+    }).then(data => {
+
+      //console.log(data.result);
+    }).catch(error => {
+      console.error(error);
+    })
+  }
 }
