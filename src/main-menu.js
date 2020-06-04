@@ -8,12 +8,20 @@ var challengerContract;
 var musicToggle;
 var musicStatus;
 var menuSound;
+var clickSound;
+var closeSound;
 var poinPayOption;
 var adWatchPayOption;
 var availableButton = [];
 
+var location = {}
 var userData = {};
 var videoProp = {};
+
+navigator.geolocation.getCurrentPosition((xCoord) => {
+  location.latitude = xCoord.coords.latitude
+  location.longitude = xCoord.coords.longitude
+})
 
 var CryptoJS = require('crypto-js');
 
@@ -25,12 +33,15 @@ export class Menu extends Phaser.Scene {
   }
 
   init(data){
+
     if(musicStatus === undefined){
       musicStatus = true;
     }
     else {
       musicStatus = data.sound_status
     }
+    clickSound = this.sound.add('CLICK_SOUND')
+    closeSound = this.sound.add('CLOSE_SOUND')
     menuSound = this.sound.add('MENU_SOUND')
     menuSound.loop = true;
     menuSound.play();
@@ -95,6 +106,7 @@ export class Menu extends Phaser.Scene {
 
   conditionChecking(){
 
+    clickSound.play()
     this.disableButtons()
     if(userData.free_chance != 0){
       let timeStart = new Date()
@@ -116,6 +128,7 @@ export class Menu extends Phaser.Scene {
     changeMind.setOrigin(0.5, 0.5);
     changeMind.setInteractive();
     changeMind.on('pointerdown', () => {
+      closeSound.play()
       poinPayOption.destroy();
       adWatchPayOption.destroy();
       optionBox.destroy();
@@ -127,6 +140,7 @@ export class Menu extends Phaser.Scene {
     poinPayOption.setOrigin(0.5,0.5);
     poinPayOption.setInteractive();
     poinPayOption.on('pointerdown', () => {
+      clickSound.play()
       poinPayOption.disableInteractive()
       adWatchPayOption.disableInteractive()
       changeMind.disableInteractive()
@@ -142,6 +156,7 @@ export class Menu extends Phaser.Scene {
     adWatchPayOption.setOrigin(0.5,0.5);
     adWatchPayOption.setInteractive();
     adWatchPayOption.on("pointerdown",() => {
+      clickSound.play()
       poinPayOption.disableInteractive()
       adWatchPayOption.disableInteractive()
       changeMind.disableInteractive()
@@ -171,6 +186,8 @@ export class Menu extends Phaser.Scene {
     adHeaderEl.src = videoProp.head_source;
     adHeaderEl.width = 300;
     adHeaderEl.height = 70;
+
+    menuSound.pause()
 
     adContentEl.addEventListener('play', (event) => {
 
@@ -205,6 +222,7 @@ export class Menu extends Phaser.Scene {
       })
 
       adContentEl.addEventListener('ended', (event) => {
+        menuSound.resume()
         let timeStart = new Date()
         this.beatTheGame(timeStart, false);
       })
@@ -226,7 +244,7 @@ export class Menu extends Phaser.Scene {
     confirmChoice.setDepth(1)
     confirmChoice.setInteractive();
     confirmChoice.on('pointerdown', () => {
-
+      clickSound.play()
       this.preloadAnimation(360, 490, 1.0, 8, 'PRE_ANIM1');
       let timeStart;
       timeStart = new Date();
@@ -239,7 +257,7 @@ export class Menu extends Phaser.Scene {
     denyChoice.setDepth(1)
     denyChoice.setInteractive();
     denyChoice.on('pointerdown', () => {
-
+      clickSound.play()
       poinPayOption.setInteractive()
       adWatchPayOption.setInteractive()
 
@@ -254,6 +272,7 @@ export class Menu extends Phaser.Scene {
   showDisclaimer(asset, size){
 
     this.disableButtons()
+    clickSound.play()
 
     let warningPopUp = this.add.sprite(360, 640, asset).setScale(size);
     warningPopUp.setOrigin(0.5, 0.5);
@@ -265,7 +284,7 @@ export class Menu extends Phaser.Scene {
       closeIt.setDepth(1);
       closeIt.setInteractive();
       closeIt.on('pointerdown', () => {
-
+        closeSound.play()
         warningPopUp.destroy();
         closeIt.destroy();
         this.activateButtons();
@@ -274,6 +293,8 @@ export class Menu extends Phaser.Scene {
   }
 
   showChallengersBoard(){
+
+    clickSound.play()
 
     this.disableButtons();
     let idHigh = [];
@@ -290,13 +311,14 @@ export class Menu extends Phaser.Scene {
     bestChallengerBoard.setOrigin(0.5,0.5);
 
     var imDone =  this.add.sprite(bestChallengerBoard.x + 200, bestChallengerBoard.y - 500, 'BM_GEXB').setScale(0.2);
-    imDone.setInteractive();
+    imDone.disableInteractive();
     imDone.setOrigin(0.5,0.5);
 
     this.challengerListing(idHigh, idCum, scoreHigh, scoreCum);
-    this.challengerMilestone(userSession, rankHSData, rankTSData);
+    this.challengerMilestone(userSession, rankHSData, rankTSData, imDone);
 
     imDone.on('pointerdown',() => {
+      closeSound.play()
       idHigh.forEach((hText) => {
         hText.destroy()
       })
@@ -322,7 +344,7 @@ export class Menu extends Phaser.Scene {
   }
 
   showTheGuidance(){
-
+    clickSound.play()
     this.disableButtons();
     var contentText = [
       '1.\nTap layar untuk menjatuhkan box\n',
@@ -349,6 +371,7 @@ export class Menu extends Phaser.Scene {
     }).setOrigin(0.5, 0.5)
 
     imDone.on('pointerdown',() => {
+      closeSound.play()
       guidanceBoard.destroy();
       guideText.destroy();
       imDone.destroy();
@@ -357,7 +380,7 @@ export class Menu extends Phaser.Scene {
   }
 
   showTheContract(){
-
+    clickSound.play()
     this.disableButtons();
 
     let page1 = [
@@ -432,6 +455,7 @@ export class Menu extends Phaser.Scene {
       }
       else {
         selector += 1
+        clickSound.play()
       }
       text.setText(tncContent[selector]);
     })
@@ -444,6 +468,7 @@ export class Menu extends Phaser.Scene {
         selector = 0
       }
       else {
+        clickSound.play()
         selector -= 1
       }
       text.setText(tncContent[selector]);
@@ -454,6 +479,7 @@ export class Menu extends Phaser.Scene {
     imDone.setOrigin(0.5,0.5);
 
     imDone.on('pointerdown',() => {
+      closeSound.play()
       contractBoard.destroy();
       text.destroy();
       nextPage.destroy();
@@ -483,6 +509,7 @@ export class Menu extends Phaser.Scene {
   }
 
   disableMusic(){
+    clickSound.play()
     if(musicStatus == true){
       menuSound.setMute(true)
       musicStatus = false;
@@ -540,7 +567,8 @@ export class Menu extends Phaser.Scene {
       }
     }
 
-    fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/stacko?lang=id", {
+    fetch("https://linipoin-api.macroad.co.id/api/v1.0/leaderboard/stacko?lang=id", {
+    //fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/stacko?lang=id", {
     //fetch("https://fb746e70.ngrok.io/api/v1.0/leaderboard/stacko?lang=id", {
 
       method: "POST",
@@ -588,12 +616,15 @@ export class Menu extends Phaser.Scene {
 
     let data = {
       datas : CryptoJS.AES.encrypt(JSON.stringify({
+        lat: location.latitude,
+        long: location.longitude,
         session: userSession,
         linigame_platform_token: '78709ab074f9ec4a3e66c6c556ac8c96576699f2'
       }), 'c0dif!#l1n!9am#enCr!pto9r4pH!*').toString()
     }
 
-    fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/check_user_limit/", {
+    fetch("https://linipoin-api.macroad.co.id/api/v1.0/leaderboard/check_user_limit/", {
+    //fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/check_user_limit/", {
     //fetch("https://fb746e70.ngrok.io/api/v1.0/leaderboard/check_user_limit/", {
 
       method: "POST",
@@ -658,8 +689,8 @@ export class Menu extends Phaser.Scene {
     let startPosC = 660
     this.preloadAnimation(360, 690, 1.2, 8, 'PRE_ANIM1');
 
-    //fetch("https://linipoin-api.macroad.co.id/api/v1.0/leaderboard/leaderboard_imlek?limit_highscore=5&limit_total_score=5&linigame_platform_token=891ff5abb0c27161fb683bcaeb1d73accf1c9c5e", {
-    fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/leaderboard_imlek?limit_highscore=5&limit_total_score=5&linigame_platform_token=891ff5abb0c27161fb683bcaeb1d73accf1c9c5e", {
+    fetch("https://linipoin-api.macroad.co.id/api/v1.0/leaderboard/leaderboard_imlek?limit_highscore=5&limit_total_score=5&linigame_platform_token=78709ab074f9ec4a3e66c6c556ac8c96576699f2", {
+    //fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/leaderboard_imlek?limit_highscore=5&limit_total_score=5&linigame_platform_token=78709ab074f9ec4a3e66c6c556ac8c96576699f2", {
 
       method: "GET",
     }).then(response => {
@@ -728,7 +759,7 @@ export class Menu extends Phaser.Scene {
     });
   }
 
-  challengerMilestone(sess, rHData, rTData){
+  challengerMilestone(sess, rHData, rTData, leave){
 
     let rankPosConfig = {
       high_score: {
@@ -741,7 +772,8 @@ export class Menu extends Phaser.Scene {
       }
     }
 
-    fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/get_user_rank/?session="+sess+"&limit=5&linigame_platform_token=78709ab074f9ec4a3e66c6c556ac8c96576699f2", {
+    fetch("https://linipoin-api.macroad.co.id/api/v1.0/leaderboard/get_user_rank/?session="+sess+"&limit=5&linigame_platform_token=78709ab074f9ec4a3e66c6c556ac8c96576699f2", {
+    //fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/get_user_rank/?session="+sess+"&limit=5&linigame_platform_token=78709ab074f9ec4a3e66c6c556ac8c96576699f2", {
     //fetch("https://fb746e70.ngrok.io/api/v1.0/leaderboard/check_user_limit/", {
 
       method: "GET",
@@ -811,6 +843,7 @@ export class Menu extends Phaser.Scene {
         }).setOrigin(1, 0.5)
       }
 
+      leave.setInteractive()
       preload.destroy();
     }).catch(error => {
 
@@ -825,7 +858,9 @@ export class Menu extends Phaser.Scene {
     this.showDisclaimer('DM_ADL', 0.5)
     this.preloadAnimation(360, 680, 1.3, 8, 'PRE_ANIM1');
     //this.disableButtons()
-    fetch('https://captive-dev.macroad.co.id/api/v2/linigames/advertisement?email='+userData.email+'&dob='+userData.date_birth+'&gender='+userData.gender+'&phone_number='+userData.phone,{
+
+    fetch('https://captive.macroad.co.id/api/v2/linigames/advertisement?email='+userData.email+'&dob='+userData.date_birth+'&gender='+userData.gender+'&phone_number='+userData.phone,{
+    //fetch('https://captive-dev.macroad.co.id/api/v2/linigames/advertisement?email='+userData.email+'&dob='+userData.date_birth+'&gender='+userData.gender+'&phone_number='+userData.phone,{
 
       method:'GET',
       headers: {
@@ -859,7 +894,8 @@ export class Menu extends Phaser.Scene {
 
   connectToSource(){
 
-    fetch('https://captive-dev.macroad.co.id/api/v2/linigames/advertisement/connect/53?email='+userData.email+'&dob='+userData.date_birth+'&gender='+userData.gender+'&phone_number='+userData.phone,{
+    fetch('https://captive.macroad.co.id/api/v2/linigames/advertisement/connect/53?email='+userData.email+'&dob='+userData.date_birth+'&gender='+userData.gender+'&phone_number='+userData.phone,{
+    //fetch('https://captive-dev.macroad.co.id/api/v2/linigames/advertisement/connect/53?email='+userData.email+'&dob='+userData.date_birth+'&gender='+userData.gender+'&phone_number='+userData.phone,{
 
       method:'GET',
       headers: {

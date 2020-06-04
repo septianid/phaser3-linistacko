@@ -90,7 +90,7 @@ export class InGame extends Phaser.Scene{
       friction: 1,
       restitution: 0,
       isStatic: true,
-      density: 100
+      density: 10000
     })
     landingGround.setScale(0.55)
     landingGround.setOrigin(0.5, 1);
@@ -104,17 +104,25 @@ export class InGame extends Phaser.Scene{
         logData.down_time = new Date();
         userLog.push(logData)
         obj1.hit = true;
+        obj1.speed = 0
         this.createNewItem();
-        //console.log(userLog);
+        obj1.gravityScale = 0
+        //console.log(boxGroup);
       }
 
       if(obj2.isCrate && !obj2.hit){
         logData.down_time = new Date()
         userLog.push(logData)
         obj2.hit = true;
+        obj2.speed = 0
         this.createNewItem();
-        //console.log(userLog);
+        obj2.gravityScale = 0
+        //console.log(boxGroup);
       }
+
+      // boxGroup.getChildren().forEach((item) => {
+      //   item.body.angle = 0
+      // })
     });
 
     //this.setCamera();
@@ -269,12 +277,18 @@ export class InGame extends Phaser.Scene{
     let fallingBox = this.matter.add.sprite(panicItem.x, panicItem.y, asset, 0, {
 
       friction: 1,
+      frictionStatic: 100,
       restitution: 0,
-      force:{
-        x: 1000,
-        y: 1000
+      collisionFilter:{
+        category: 2
       },
-      density: 5000
+      force:{
+        x: 0,
+        y: 0
+      },
+      sleepThreshold: 0,
+      slop: 0.1,
+      //density: 5000
     });
     fallingBox.setScale(0.16)
     fallingBox.setOrigin(0.5, 0.5);
@@ -373,7 +387,8 @@ export class InGame extends Phaser.Scene{
       datas: CryptoJS.AES.encrypt(JSON.stringify(data), 'c0dif!#l1n!9am#enCr!pto9r4pH!*').toString()
     }
 
-    fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/stacko?lang=id", {
+    fetch("https://linipoin-api.macroad.co.id/api/v1.0/leaderboard/stacko?lang=id", {
+    //fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/stacko?lang=id", {
     //fetch("https://fb746e70.ngrok.io/api/v1.0/leaderboard/stacko?lang=id", {
 
       method: "PUT",

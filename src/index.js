@@ -13,9 +13,9 @@ const config = {
   physics:{
     default: 'matter',
     matter:{
-      debug:{
-        showBody: true
-      },
+      // debug:{
+      //   showBody: true
+      // },
       gravity:{
         y: 4
       }
