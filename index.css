@@ -1,0 +1,22 @@
+body {
+  background-color: #FFF6E8;
+  font-family: 'HelveticaRoundedLTStd', 'Bobbleboddy';
+}
+
+canvas {
+  margin: 0;
+}
+
+@font-face {
+  font-family: "HelveticaRoundedLTStd";
+  font-style: normal;
+  font-weight: 400;
+  src: url("src/assets/font/HelveticaRoundedLTStd-Black.otf");
+}
+
+@font-face {
+  font-family: "Bobbleboddy";
+  font-style: normal;
+  font-weight: 400;
+  src: url("src/assets/font/Bobbleboddy.ttf");
+}

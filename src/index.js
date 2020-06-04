@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import {InGame} from './in-game.js';
 import {Menu} from './main-menu.js';
+import {Loading} from './loading.js'
 
 const config = {
   type: Phaser.CANVAS,
@@ -12,11 +13,11 @@ const config = {
   physics:{
     default: 'matter',
     matter:{
-      debug:{
-        showBody: true
-      },
+      // debug:{
+      //   showBody: true
+      // },
       gravity:{
-        y: 4.5
+        y: 4
       }
     }
   },
@@ -26,7 +27,7 @@ const config = {
     width: 720,
     height: 1280,
   },
-  scene: [Menu, InGame],
+  scene: [Loading, Menu, InGame],
   audio: {
     disableWebAudio : true,
   }
