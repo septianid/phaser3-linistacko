@@ -401,34 +401,13 @@ export class Menu extends Phaser.Scene {
       "    permainan akan langsung",
       "    ditambahkan ke akumulasi poin",
       "    pada LINIPOIN anda masing-masing.",
-      "5. LINIPOIN dengan dan/atau tanpa",
-      "    pemberitahuan sebelumnya berhak",
-      "    secara sepihak membatalkan",
-      "    pemenang dan pemberian hadiah",
-    ]
-    let page2 = [
-      "    event yang merugikan pihak",
-      "    LINIPOIN termasuk namun tidak",
-      "    terbatas pada:",
-      "     * Penggunaan lebih dari 1 (satu)",
-      "        akun oleh 1 (satu) Customer",
-      "        atau kelompok yang sama,",
-      "        dan/atau",
-      "     * Identitas pemilik akun yang",
-      "        sama, dan/atau",
-      "     * Nomor handphone yang sama,",
-      "        dan/atau",
-      "     * Alamat pengiriman yang sama,",
-      "        dan/atau",
-      "     * Nomor rekening/kartu kredit/",
-      "        debit/identitas pembayaran",
-      "        yang sama, dan/atau",
-      "     * Riwayat transaksi yang sama,",
-      "        dan/atau",
-      "6. Jika ada pertanyaan lebih lanjut",
+      "5. Jika ada pertanyaan lebih lanjut",
       "    silahkan ajukan ke Pusat Bantuan,",
       "    DM via Instagram @linipoin.id atau",
       "    email ke info@linipoin.com"
+    ]
+    let page2 = [
+
     ]
 
     let tncContent = [page1, page2]
@@ -446,33 +425,33 @@ export class Menu extends Phaser.Scene {
       }
     }).setOrigin(0.5, 0.5);
 
-    let nextPage = this.add.sprite(470, 1010, 'BM_NEXT').setScale(0.12)
-    nextPage.setOrigin(0.5, 0.5);
-    nextPage.setInteractive()
-    nextPage.on('pointerdown', () => {
-      if(selector >= tncContent.length - 1){
-        selector = tncContent.length - 1
-      }
-      else {
-        selector += 1
-        clickSound.play()
-      }
-      text.setText(tncContent[selector]);
-    })
-
-    let prevPage = this.add.sprite(250, 1010, 'BM_PREV').setScale(0.12)
-    prevPage.setOrigin(0.5, 0.5);
-    prevPage.setInteractive()
-    prevPage.on('pointerdown', () => {
-      if(selector <= 0){
-        selector = 0
-      }
-      else {
-        clickSound.play()
-        selector -= 1
-      }
-      text.setText(tncContent[selector]);
-    })
+    // let nextPage = this.add.sprite(470, 1010, 'BM_NEXT').setScale(0.12)
+    // nextPage.setOrigin(0.5, 0.5);
+    // nextPage.setInteractive()
+    // nextPage.on('pointerdown', () => {
+    //   if(selector >= tncContent.length - 1){
+    //     selector = tncContent.length - 1
+    //   }
+    //   else {
+    //     selector += 1
+    //     clickSound.play()
+    //   }
+    //   text.setText(tncContent[selector]);
+    // })
+    //
+    // let prevPage = this.add.sprite(250, 1010, 'BM_PREV').setScale(0.12)
+    // prevPage.setOrigin(0.5, 0.5);
+    // prevPage.setInteractive()
+    // prevPage.on('pointerdown', () => {
+    //   if(selector <= 0){
+    //     selector = 0
+    //   }
+    //   else {
+    //     clickSound.play()
+    //     selector -= 1
+    //   }
+    //   text.setText(tncContent[selector]);
+    // })
 
     var imDone =  this.add.sprite(contractBoard.x + 200, contractBoard.y - 450, 'BM_GEXB').setScale(0.2);
     imDone.setInteractive();
@@ -482,8 +461,8 @@ export class Menu extends Phaser.Scene {
       closeSound.play()
       contractBoard.destroy();
       text.destroy();
-      nextPage.destroy();
-      prevPage.destroy();
+      // nextPage.destroy();
+      // prevPage.destroy();
       imDone.destroy();
       this.activateButtons();
     })
@@ -772,8 +751,8 @@ export class Menu extends Phaser.Scene {
       }
     }
 
-    fetch("https://linipoin-api.macroad.co.id/api/v1.0/leaderboard/get_user_rank/?session="+sess+"&limit=5&linigame_platform_token=78709ab074f9ec4a3e66c6c556ac8c96576699f2", {
-    //fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/get_user_rank/?session="+sess+"&limit=5&linigame_platform_token=78709ab074f9ec4a3e66c6c556ac8c96576699f2", {
+    fetch("https://linipoin-api.macroad.co.id/api/v1.0/leaderboard/get_user_rank_imlek/?session="+sess+"&limit=5&linigame_platform_token=78709ab074f9ec4a3e66c6c556ac8c96576699f2", {
+    //fetch("https://linipoin-dev.macroad.co.id/api/v1.0/leaderboard/get_user_rank_imlek/?session="+sess+"&limit=5&linigame_platform_token=78709ab074f9ec4a3e66c6c556ac8c96576699f2", {
     //fetch("https://fb746e70.ngrok.io/api/v1.0/leaderboard/check_user_limit/", {
 
       method: "GET",
@@ -793,7 +772,7 @@ export class Menu extends Phaser.Scene {
     }).then(data => {
 
       //console.log(data.result);
-      if(data.result.rank_high_score === '-'){
+      if(data.result.rank_high_score === 0){
         rHData.rank = this.add.text(rankPosConfig.high_score.x, rankPosConfig.high_score.y, ''+data.result.rank_high_score, {
           font: '28px HelveticaRoundedLTStd',
           fill: '#84446D',
@@ -818,7 +797,7 @@ export class Menu extends Phaser.Scene {
         }).setOrigin(1, 0.5)
       }
 
-      if(data.result.rank_total_score === '-'){
+      if(data.result.rank_total_score === 0){
         rTData.rank = this.add.text(rankPosConfig.total_score.x, rankPosConfig.total_score.y, ''+data.result.rank_total_score, {
           font: '28px HelveticaRoundedLTStd',
           fill: '#84446D',
@@ -836,7 +815,7 @@ export class Menu extends Phaser.Scene {
           fill: '#84446D',
           align: 'left'
         }).setOrigin(0, 0.5)
-        rTData.score = this.add.text(rankPosConfig.total_score.x + 390, rankPosConfig.total_score.y, ''+data.result.rank_total_score.user_total_score, {
+        rTData.score = this.add.text(rankPosConfig.total_score.x + 390, rankPosConfig.total_score.y, ''+data.result.rank_total_score.total_score, {
           font: '25px HelveticaRoundedLTStd',
           fill: '#84446D',
           align: 'right'
@@ -894,8 +873,8 @@ export class Menu extends Phaser.Scene {
 
   connectToSource(){
 
-    fetch('https://captive.macroad.co.id/api/v2/linigames/advertisement/connect/53?email='+userData.email+'&dob='+userData.date_birth+'&gender='+userData.gender+'&phone_number='+userData.phone,{
-    //fetch('https://captive-dev.macroad.co.id/api/v2/linigames/advertisement/connect/53?email='+userData.email+'&dob='+userData.date_birth+'&gender='+userData.gender+'&phone_number='+userData.phone,{
+    fetch('https://captive.macroad.co.id/api/v2/linigames/advertisement/connect/53?game_title=linistacko&email='+userData.email+'&dob='+userData.date_birth+'&gender='+userData.gender+'&phone_number='+userData.phone,{
+    //fetch('https://captive-dev.macroad.co.id/api/v2/linigames/advertisement/connect/53?game_title=linistacko&email='+userData.email+'&dob='+userData.date_birth+'&gender='+userData.gender+'&phone_number='+userData.phone,{
 
       method:'GET',
       headers: {

@@ -64,6 +64,7 @@ export class Loading extends Phaser.Scene{
     this.load.audio('MENU_SOUND', "./src/assets/sound/MENU_SOUND.mp3");
     this.load.audio('CLICK_SOUND', "./src/assets/sound/CLICK_SOUND.mp3");
     this.load.audio('CLOSE_SOUND', "./src/assets/sound/CLOSE_SOUND.mp3");
+    this.load.audio('POIN_COUNT', "./src/assets/sound/POIN_COUNT.mp3");
 
     progressBar = this.add.graphics();
     progressBox = this.add.sprite(360, 640, 'LOADING_BOX').setScale(0.4);

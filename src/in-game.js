@@ -220,7 +220,7 @@ export class InGame extends Phaser.Scene{
           })
           removeEvent = this.time.addEvent({
 
-            delay: 100,
+            delay: 500,
             callback: this.removeItem,
             callbackScope: this,
             loop: true
@@ -305,6 +305,7 @@ export class InGame extends Phaser.Scene{
 
     let boxScoreText;
     let userScoreText;
+    let coinSound = this.sound.add('POIN_COUNT');
 
     if(boxGroup.getChildren().length > 0){
 
@@ -318,14 +319,13 @@ export class InGame extends Phaser.Scene{
       userScore += stackHeight;
 
       boxScoreText = this.add.text(tempBox.x, tempBox.y, ''+stackHeight, {
-
-        font: 'bold 20px Arial',
-        fill: 'black',
+        font: 'bold 24px Arial',
+        fill: '#FF9D27',
         align: 'center'
       }).setOrigin(0.5, 0.5);
-
+      boxScoreText.setStroke('black', 5)
       tempBox.destroy();
-
+      coinSound.play();
       //mainCamera.ignore(boxScoreText)
     }
 
