@@ -18,7 +18,8 @@ const config = {
       // },
       gravity:{
         y: 4
-      }
+      },
+      enableSleeping: true
     }
   },
   scale:{
