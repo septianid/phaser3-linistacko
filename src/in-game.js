@@ -1,20 +1,18 @@
 import Phaser from "phaser";
 
 var boxGroup;
+//var stack
 
 var timer;
 var timerEvent;
 var removeEvent;
-
 var timeText;
-
 var landingGround;
 var panicItem;
 var isPossible;
 var userScore;
-
-var boxHeight;
-var groundHeight;
+// var boxHeight;
+// var groundHeight;
 var mainCamera;
 var crateArray = []
 var theCrate
@@ -61,8 +59,8 @@ export class InGame extends Phaser.Scene{
     var background = this.add.sprite(360, 1280, 'MENU_BG').setScale(0.68, 0.67)
     background.setOrigin(0.5, 1);
 
-    boxHeight = 70;
-    groundHeight = this.textures.get('GROUND').getSourceImage().height - 150;
+    // boxHeight = this.textures.get('B1').getSourceImage().height;
+    // groundHeight = this.textures.get('GROUND').getSourceImage().height - 150;
 
     userScore = 0;
     timer = 0;
@@ -90,7 +88,7 @@ export class InGame extends Phaser.Scene{
       friction: 1,
       restitution: 0,
       isStatic: true,
-      density: 10000
+      density: 1000
     })
     landingGround.setScale(0.55)
     landingGround.setOrigin(0.5, 1);
@@ -98,27 +96,30 @@ export class InGame extends Phaser.Scene{
     theCrate = Phaser.Math.Between(0, crateArray.length - 1)
     this.panicCrate();
 
-    this.matter.world.on('collisionstart', (e, obj1, obj2) => {
+    this.matter.world.on('collisionstart', (events) => {
 
-      if(obj1.isCrate && !obj1.hit){
-        logData.down_time = new Date();
-        userLog.push(logData)
-        obj1.hit = true;
-        obj1.speed = 0
-        this.createNewItem();
-        obj1.gravityScale = 0
-        //console.log(boxGroup);
-      }
+      events.pairs.forEach((pair) => {
 
-      if(obj2.isCrate && !obj2.hit){
-        logData.down_time = new Date()
-        userLog.push(logData)
-        obj2.hit = true;
-        obj2.speed = 0
-        this.createNewItem();
-        obj2.gravityScale = 0
-        //console.log(boxGroup);
-      }
+        const {bodyA, bodyB} = pair;
+        //console.log(bodyB);
+
+        if(bodyA.isCrate && !bodyA.hit){
+          logData.down_time = new Date();
+          userLog.push(logData)
+          bodyA.hit = true;
+          bodyA.timeScale = 0.7
+          this.createNewItem();
+          //console.log(obj1);
+        }
+        if(bodyB.isCrate && !bodyB.hit){
+          logData.down_time = new Date()
+          userLog.push(logData)
+          bodyB.hit = true;
+          bodyB.timeScale = 0.7
+          this.createNewItem();
+          //console.log(userLog);
+        }
+      })
 
       // boxGroup.getChildren().forEach((item) => {
       //   item.body.angle = 0
@@ -132,16 +133,16 @@ export class InGame extends Phaser.Scene{
 
     boxGroup.getChildren().forEach((box, i) => {
 
-      if(box.y > (this.game.config.height + box.displayHeight)){
-
-        if(!box.body.hit){
+      if(box.y > this.game.config.height){
+        if(box.body.hit === false){
+          //console.log('tes fall '+i);
           logData.destroy_time = new Date()
           userLog.push(logData)
           box.destroy()
           this.createNewItem();
         }
         else {
-          //console.log('tes '+i);
+          //console.log('hit then fall '+i);
           if(userLog[i].destroy_time === null){
             userLog[i].destroy_time = new Date()
           }
@@ -264,12 +265,14 @@ export class InGame extends Phaser.Scene{
 
       if(isPossible == true && timer < gameOption.gameTime){
 
+        //console.log(stack);
         this.gameTimer();
         panicItem.visible = false;
         isPossible = false;
         this.fallingItem(crateArray[theCrate]);
       }
     })
+
   }
 
   fallingItem(asset){
@@ -277,27 +280,21 @@ export class InGame extends Phaser.Scene{
     let fallingBox = this.matter.add.sprite(panicItem.x, panicItem.y, asset, 0, {
 
       friction: 1,
-      frictionStatic: 100,
+      frictionStatic: 50,
       restitution: 0,
-      collisionFilter:{
-        category: 2
-      },
-      force:{
-        x: 0,
-        y: 0
-      },
-      sleepThreshold: 0,
+      sleepThreshold: 60,
       slop: 0.1,
-      //density: 5000
+      density: 100,
     });
     fallingBox.setScale(0.16)
     fallingBox.setOrigin(0.5, 0.5);
-
     fallingBox.body.isCrate = true;
     fallingBox.body.hit = false;
     logData.up_time = new Date()
     logData.destroy_time = null
     boxGroup.add(fallingBox);
+    //stack.bodies.push(fallingBox.body)
+    //console.log(fallingBox);
     //this.cameras.main.ignore(fallingBox);
   }
 
@@ -314,10 +311,16 @@ export class InGame extends Phaser.Scene{
       let boxScoreText;
 
       tempBox = boxGroup.getFirstAlive();
-      stackHeight = Math.round((this.game.config.height - groundHeight - tempBox.y - boxHeight / 2) / boxHeight) + 1;
-      //console.log(stackHeight);
-      userScore += stackHeight;
-
+      //console.log(tempBox);
+      //stackHeight = Math.round((this.game.config.height - groundHeight - tempBox.y - boxHeight / 2) / boxHeight) + 1;
+      stackHeight = Math.round((this.game.config.height - Math.round(landingGround.displayHeight - 50) - tempBox.y - Math.round(tempBox.displayHeight) / 2) / Math.round(tempBox.displayHeight)) + 1;
+      if(stackHeight <= 0){
+        stackHeight = 0
+        userScore += 0
+      }
+      else {
+        userScore += stackHeight;
+      }
       boxScoreText = this.add.text(tempBox.x, tempBox.y, ''+stackHeight, {
         font: 'bold 24px Arial',
         fill: '#FF9D27',
@@ -335,6 +338,7 @@ export class InGame extends Phaser.Scene{
       let userScoreSignText;
 
       removeEvent.remove();
+      //console.log(userLog);
 
       userScoreSignText = this.add.text(360, 500, 'YOUR SCORE', {
 
@@ -408,11 +412,8 @@ export class InGame extends Phaser.Scene{
       }
 
     }).then(data => {
-
       //console.log(data.result);
-
     }).catch(error => {
-
       console.log(error.result);
     });
   }

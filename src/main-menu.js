@@ -77,6 +77,7 @@ export class Menu extends Phaser.Scene {
     challengerContract.setOrigin(0.5,0.5);
     challengerContract.on("pointerdown",() => this.showTheContract())
 
+
     if(musicStatus === true){
       menuSound.setMute(false)
       musicToggle = this.add.sprite(530, challengerGuideSign.y, 'BM_5N').setScale(0.16);
