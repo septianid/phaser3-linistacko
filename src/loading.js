@@ -3,6 +3,8 @@ import Phaser from "phaser";
 var progressBar;
 var progressBox;
 var background_loading;
+var isComplete = false;
+var isError= false;
 
 export class Loading extends Phaser.Scene{
 
@@ -13,7 +15,8 @@ export class Loading extends Phaser.Scene{
         files: [
           { type: 'image', key: 'LOADING_BOX', url: 'src/assets/LOADING_BOX.png'},
           { type: 'image', key: 'LOADING_BG', url: 'src/assets/LOADING_BG.jpg'},
-          { type: 'image', key: 'TITLE', url: './src/assets/LOGO.png'}
+          { type: 'image', key: 'TITLE', url: './src/assets/LOGO.png'},
+          { type: 'image', key: 'WM_EL', url: './src/assets/WM_EL.png'}
         ]
       }
     });
@@ -104,6 +107,10 @@ export class Loading extends Phaser.Scene{
     //   }
     // });
     // assetText.setOrigin(0.5, 0.5);
+    this.load.once('loaderror', function (file) {
+      isError = true;
+      //console.log('error load ');
+    })
 
     this.load.on('progress', function (value) {
       progressBar.clear();
@@ -113,12 +120,14 @@ export class Loading extends Phaser.Scene{
       progressBar.setDepth(1)
     });
 
-    this.load.on('fileprogress', function (file) {
 
+    this.load.on('fileprogress', function (file) {
+      //console.log(file);
     });
 
     this.load.on('complete', () => {
 
+      isComplete = true
       progressBox.setDepth(1);
       progressBar.fillStyle(0xF17CF7, 1)
       progressBar.fillRect(180, 615, 360, 50);
@@ -128,17 +137,25 @@ export class Loading extends Phaser.Scene{
 
   create(){
 
-    var tapSign = this.add.sprite(360, 800, 'TAP').setScale(0.4);
-    tapSign.setOrigin(0.5, 0.5)
+    if(isComplete == true && isError == false){
+      var tapSign = this.add.sprite(360, 800, 'TAP').setScale(0.4);
+      tapSign.setOrigin(0.5, 0.5)
+
+      this.input.on("pointerdown", () => {
+        this.scene.start("MainMenu");
+      })
+    }
+    else {
+      var warning = this.add.sprite(360, 620, 'WM_EL').setScale(0.45, 0.5);
+      warning.setOrigin(0.5, 0.5)
+      warning.setDepth(1)
+    }
+
     //var ad = this.add.sprite(360, 1150, 'ad_logo').setScale(0.25)
     //ad.setOrigin(0.5, 0.5);
 
     //tapSign.anims.play('blink', true);
 
-    this.input.on("pointerdown", () => {
-
-      this.scene.start("MainMenu");
-    })
   }
 
 }
