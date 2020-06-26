@@ -658,7 +658,7 @@ export class Menu extends Phaser.Scene {
 
     }).catch(error => {
 
-      //console.log(error);
+      console.log(error);
       this.showDisclaimer('WM_SE', 0.5)
     });
   }
